@@ -1,0 +1,48 @@
+- hosts: localhost
+  become: yes
+  gather_facts: no
+  tasks:
+  - name: Install mysql repo
+    yum:
+      name: https://dev.mysql.com/get/mysql80-community-release-el7-1.noarch.rpm
+      state: latest
+  - name: Install MariaDB server
+    yum: 
+      name: mariadb-server 
+      state: present
+  - name: Install MariaDB devel
+    yum: 
+      name: mariadb-devel 
+      state: present
+
+  - name: Install Ruby
+    yum: 
+      name: ruby 
+      state: latest
+  - name: Install Ruby devel
+    yum: 
+      name: ruby-devel 
+      state: latest
+  - name: Install JavaScript
+    yum: 
+      name: nodejs 
+      state: latest
+
+  - name: Install git
+    yum: 
+      name: git 
+      state: latest
+
+  - name: Install Development Tools
+    yum: 
+      name: "@Development tools" 
+      state: latest
+
+  - name: Install Bundler
+    gem: 
+      name: bundler 
+      state: latest
+  - name: Install Procodile
+    gem: 
+      name: procodile 
+      state: latest

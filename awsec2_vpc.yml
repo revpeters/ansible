@@ -1,0 +1,14 @@
+--- # EC2 VPC module
+- hosts: localhost
+  connection: local
+  remote_user: jacopete
+  become: no
+  gather_facts: no
+  tasks:
+    - name: Create a Basic VPC with 10.x.x.x IP range
+      ec2_vpc_net:
+        name: ec2_vpc_net VPC test
+        region: us-east-1
+        state: present
+        cidr_block: 10.2.1.0/24
+      register: vpcblock

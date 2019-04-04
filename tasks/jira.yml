@@ -1,0 +1,68 @@
+--- # Install jira on an AW EC2 instance
+#- Create atlasian user
+#- Create jira dir /data/atlassian/jira
+#- Create jira-home dir /data/atlassian/jira-home
+#- untar ball into /data/atlassian/jira and remove ball
+#- set user.sh in jira/bin to atlasian
+#- set setenv.sh in jira/bin environment variables
+#- set server.xml in jira/conf
+
+- hosts: jira
+  connection: ssh
+  remote_user: ec2-user
+  become: yes
+  gather_facts: yes
+  tasks:
+    - name: Install httpd and java
+      yum:
+        name: "{{ item }}"
+      with_items:
+        - httpd
+        - java
+
+    - name: Create jira FS
+      file:
+        path: /data/atlassian/jira
+        owner: atlasian
+        group: atlasian
+        state: directory
+        mode: 0700
+
+    - name: Create jira-home FS
+      file:
+        path: /data/atlassian/jira-home
+        owner: atlasian
+        group: atlasian
+        state: directory
+        mode: 0700
+
+    - name: download tar ball
+      get_url:
+        url: https://www.atlassian.com/software/jira/downloads/binary/atlassian-jira-software-7.13.1.tar.gz
+        dest: /data/atlassian/jira
+        mode: 0777
+
+    - name: untar it in jira FS
+      unarchive:
+        src: /data/atlassian/jira/atlassian-jira-software-7.13.1.tar.gz
+        dest: /data/atlassian/jira
+        owner: atlasian
+        group: atlasian
+        remote_src: yes
+
+    - name: update setenv.sh with java_home
+      lineinfile:
+        path: /data/atlassian/jira/atlassian-jira-software-7.13.1-standalone/bin/setenv.sh
+        regexp: '^#JIRA_HOME='
+        line: 'JIRA_HOME="/data/atlassian/jira-home"'
+
+    - name: Start HTTPD
+      service:
+        name: httpd
+        state: started
+
+    - name: Start JIRA
+      command: su - atlasian -c "/data/atlassian/jira/atlassian-jira-software-7.13.1-standalone/bin/start-jira.sh"
+
+#    - name: set user.sh
+#    - name: set server.xml

@@ -1,0 +1,24 @@
+--- # Install nmap and update /etc/hosts
+- hosts: jumphost
+  connection: ssh
+  remote_user: ec2-user
+  become: yes
+  gather_facts: no
+  tasks:
+  - name: Wait for SSH on jumphost
+    wait_for_connection:
+      timeout: 120
+  - name: Execute All Installations
+    yum:
+      name: "{{ item }}"
+    with_items:
+    - nmap
+    notify:
+    - UpdateETCHosts
+  handlers:
+  - name: UpdateETCHosts
+    blockinfile:
+      path: /etc/hosts
+      block: |
+        10.0.1.34     jira.test.nva
+        10.0.1.64     conf.test.nva

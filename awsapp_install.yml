@@ -1,0 +1,39 @@
+--- # Install an application on an AW EC2 instance
+- hosts: aws
+  connection: ssh
+  remote_user: ec2-user
+  become: yes
+  gather_facts: yes
+  tasks:
+    - name: Connect to remote host
+      yum:
+        name: '*'
+        state: latest
+    - name: Install HTTPD
+      yum:
+        name: httpd
+        state: latest
+    - name: Deploy the static website
+      copy:
+        src: /etc/ansible/files/index.html
+        dest: /var/www/html/index.html
+        owner: root
+        group: root
+        mode: 0655
+        backup: yes
+    - name: Restart HTTPD
+      service:
+        name: httpd
+        state: restarted
+    - name: Wait for HTTPD to restart
+      wait_for:
+        host: ec2-54-174-115-80.compute-1.amazonaws.com
+        port: 80
+        delay: 5
+    - name: Test the site
+      uri:
+        url: http://localhost
+        return_content: yes
+      register: site_results
+    - name: Display results
+      debug: var=site_results

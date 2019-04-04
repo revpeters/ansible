@@ -1,0 +1,27 @@
+--- # Install an application on an AW EC2 instance
+- hosts: aws
+  connection: ssh
+  remote_user: ec2-user
+  become: yes
+  gather_facts: yes
+  tasks:
+    - name: Execute All Installations
+      yum:
+        name: "{{ item }}"
+      with_items:
+        - httpd
+      notify:
+        - CopySiteFiles
+        - RestartHTTPD
+  handlers:
+    - name: CopySiteFiles
+      copy:
+        src: /etc/ansible/files/index.html
+        dest: /var/www/html/index.html
+        owner: root
+        group: root
+        mode: 0655
+    - name: RestartHTTPD
+      service:
+        name: httpd
+        state: restarted
