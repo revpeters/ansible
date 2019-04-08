@@ -1,17 +1,11 @@
 --- # Install jira on an AW EC2 instance
-#- Create atlasian user
-#- Create jira dir /data/atlassian/jira
-#- Create jira-home dir /data/atlassian/jira-home
-#- untar ball into /data/atlassian/jira and remove ball
-#- set user.sh in jira/bin to atlasian
-#- set setenv.sh in jira/bin environment variables
-#- set server.xml in jira/conf
-
 - hosts: jira
   connection: ssh
   remote_user: ec2-user
   become: yes
   gather_facts: yes
+  vars:
+    java_home: /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.201.b09-0.amzn2.x86_64/jre/
   tasks:
     - name: Install httpd and java
       yum:
@@ -19,6 +13,12 @@
       with_items:
         - httpd
         - java
+
+    - name: Update JAVA_HOME
+      lineinfile:
+        path: /home/atlasian/.bash_profile
+        insertbefore: 'export PATH'
+        line: 'export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.201.b09-0.amzn2.x86_64/jre/'
 
     - name: Create jira FS
       file:
@@ -50,7 +50,7 @@
         group: atlasian
         remote_src: yes
 
-    - name: update setenv.sh with java_home
+    - name: update setenv.sh with JIRA_HOME
       lineinfile:
         path: /data/atlassian/jira/atlassian-jira-software-7.13.1-standalone/bin/setenv.sh
         regexp: '^#JIRA_HOME='
@@ -63,6 +63,3 @@
 
     - name: Start JIRA
       command: su - atlasian -c "/data/atlassian/jira/atlassian-jira-software-7.13.1-standalone/bin/start-jira.sh"
-
-#    - name: set user.sh
-#    - name: set server.xml

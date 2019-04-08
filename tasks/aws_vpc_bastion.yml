@@ -62,13 +62,24 @@
   - name: Create DB Subnet
     ec2_vpc_subnet:
       resource_tags:
-        Name: alm-{{ customer_name }}-dbSubnet
+        Name: alm-{{ customer_name }}-dbSubnet-1
       state: present
       vpc_id: "{{ vpc_id }}"
       region: "{{ region }}"
       cidr: 10.0.2.0/24
       az: us-east-1f
-    register: db_subnet
+    register: db_subnet_1
+    
+  - name: Create DB Subnet
+    ec2_vpc_subnet:
+      resource_tags:
+        Name: alm-{{ customer_name }}-dbSubnet-2
+      state: present
+      vpc_id: "{{ vpc_id }}"
+      region: "{{ region }}"
+      cidr: 10.0.3.0/24
+      az: us-east-1e
+    register: db_subnet_2
 
   - name: Set Public Subnet ID in var
     set_fact:
@@ -80,7 +91,11 @@
 
   - name: Set Database Subnet ID in var
     set_fact:
-      db_subnet_id: "{{ db_subnet.subnet.id }}"
+      db_subnet_1_id: "{{ db_subnet_1.subnet.id }}"
+      
+  - name: Set Database Subnet ID in var
+    set_fact:
+      db_subnet_2_id: "{{ db_subnet_2.subnet.id }}"
 
   - name: Create  Route Table
     ec2_vpc_route_table:
@@ -92,7 +107,8 @@
       subnets:
         - "{{ public_subnet_id }}"
         - "{{ private_subnet_id }}"
-        - "{{ db_subnet_id }}"
+        - "{{ db_subnet_1_id }}"
+        - "{{ db_subnet_2_id }}"
       routes:
         - dest: "0.0.0.0/0"
           gateway_id: "{{ igw_id }}"
@@ -106,7 +122,8 @@
       subnets:
         - "{{ public_subnet_id }}"
         - "{{ private_subnet_id }}"
-        - "{{ db_subnet_id }}"
+        - "{{ db_subnet_1_id }}"
+        - "{{ db_subnet_2_id }}"
       ingress: [
         # rule no, protocol, allow/deny, cidr, icmp_code, icmp_type, port from, port to
         [100, 'all', 'allow', '0.0.0.0/0', null, null, null, null],
@@ -176,6 +193,7 @@
             - 80
             - 443
             - 8080
+            - 8090
           cidr_ip: 0.0.0.0/0
         - proto: "tcp"
           ports: 22
