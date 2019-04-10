@@ -1,0 +1,75 @@
+--- # AWS ALM VPC Creation
+- hosts: localhost
+  connection: local
+  remote_user: jacopete
+  become: no
+  gather_facts: no
+  vars:
+    image: ami-011b3ccf1bd6db744
+    customer_name: test
+    region: us-east-1
+    ec2_key: LA-us-east-1
+    ssh_config_path: /home/jacopete/.ssh/config
+    identity_file: /home/jacopete/.ssh/LA-us-east-1.pem
+    atlassian_user: atlasian
+    atlassian_group: atlasian
+  tasks:
+  - name: Create Public Subnet
+    ec2_vpc_subnet:
+      resource_tags:
+        Name: alm-{{ customer_name }}-publicSubnet
+      state: present
+      vpc_id: "{{ vpc_id }}"
+      region: "{{ region }}"
+      cidr: 10.0.0.0/24
+      az: us-east-1a
+    register: public_subnet
+
+  - name: Create Private Subnet
+    ec2_vpc_subnet:
+      resource_tags:
+        Name: alm-{{ customer_name }}-privateSubnet
+      state: present
+      vpc_id: "{{ vpc_id }}"
+      region: "{{ region }}"
+      cidr: 10.0.1.0/24
+      az: us-east-1a
+    register: private_subnet
+
+  - name: Create DB Subnet
+    ec2_vpc_subnet:
+      resource_tags:
+        Name: alm-{{ customer_name }}-dbSubnet-1
+      state: present
+      vpc_id: "{{ vpc_id }}"
+      region: "{{ region }}"
+      cidr: 10.0.2.0/24
+      az: us-east-1f
+    register: db_subnet_1
+
+  - name: Create DB Subnet
+    ec2_vpc_subnet:
+      resource_tags:
+        Name: alm-{{ customer_name }}-dbSubnet-2
+      state: present
+      vpc_id: "{{ vpc_id }}"
+      region: "{{ region }}"
+      cidr: 10.0.3.0/24
+      az: us-east-1e
+    register: db_subnet_2
+
+  - name: Set Public Subnet ID in var
+    set_fact:
+      public_subnet_id: "{{ public_subnet.subnet.id }}"
+
+  - name: Set Private Subnet ID in var
+    set_fact:
+      private_subnet_id: "{{ private_subnet.subnet.id }}"
+
+  - name: Set Database Subnet ID in var
+    set_fact:
+      db_subnet_1_id: "{{ db_subnet_1.subnet.id }}"
+
+  - name: Set Database Subnet ID in var
+    set_fact:
+      db_subnet_2_id: "{{ db_subnet_2.subnet.id }}"

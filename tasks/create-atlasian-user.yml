@@ -1,0 +1,26 @@
+--- # Create atlasian user on both app hosts
+- hosts: jira,conf
+  connection: ssh
+  remote_user: ec2-user
+  become: yes
+  gather_facts: yes
+  vars:
+    image: ami-011b3ccf1bd6db744
+    customer_name: test
+    region: us-east-1
+    ec2_key: LA-us-east-1
+    ssh_config_path: /home/jacopete/.ssh/config
+    identity_file: /home/jacopete/.ssh/LA-us-east-1.pem
+    atlassian_user: atlasian
+    atlassian_group: atlasian
+  tasks:
+    - name: Create Atlasian group
+      group:
+        name: "{{ atlassian_group }}"
+        state: present
+
+    - name: Create Atlasian user
+      user:
+        name: "{{ atlassian_user }}"
+        group: "{{ atlassian_group }}"
+        shell: /bin/bash

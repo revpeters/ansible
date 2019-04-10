@@ -1,5 +1,6 @@
 ---
-- import_playbook: tasks/aws_vpc_bastion.yml
-- import_playbook: tasks/aws_jumphost_config.yml
-- import_playbook: tasks/create_atlasian_user.yml
-- import_playbook: tasks/jira.yml
+- import_playbook: tasks/create-vpc.yml
+- import_playbook: tasks/bastion-config.yml
+- import_playbook: tasks/create-atlasian-user.yml
+- import_playbook: tasks/install-jira.yml
+- import_playbook: tasks/install-conf.yml

@@ -1,0 +1,33 @@
+--- # Install nmap and update /etc/hosts
+- hosts: jumphost
+  connection: ssh
+  remote_user: ec2-user
+  become: yes
+  gather_facts: no
+  vars:
+    image: ami-011b3ccf1bd6db744
+    customer_name: test
+    region: us-east-1
+    ec2_key: LA-us-east-1
+    ssh_config_path: /home/jacopete/.ssh/config
+    identity_file: /home/jacopete/.ssh/LA-us-east-1.pem
+    atlassian_user: atlasian
+    atlassian_group: atlasian
+  tasks:
+  - name: Wait for SSH on jumphost
+    wait_for_connection:
+      timeout: 120
+  - name: Execute All Installations
+    yum:
+      name: "{{ item }}"
+    with_items:
+    - nmap
+    notify:
+    - UpdateETCHosts
+  handlers:
+  - name: UpdateETCHosts
+    blockinfile:
+      path: /etc/hosts
+      block: |
+        10.0.1.34     jira.{{ customer_name }}.nva
+        10.0.1.64     conf.{{ customer_name }}.nva

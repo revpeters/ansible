@@ -1,0 +1,23 @@
+--- # AWS ALM VPC Creation
+- hosts: localhost
+  connection: local
+  remote_user: jacopete
+  become: no
+  gather_facts: no
+  vars:
+    image: ami-011b3ccf1bd6db744
+    customer_name: test
+    region: us-east-1
+    ec2_key: LA-us-east-1
+    ssh_config_path: /home/jacopete/.ssh/config
+    identity_file: /home/jacopete/.ssh/LA-us-east-1.pem
+  tasks:
+  - name: Update ssh config
+    blockinfile:
+      path: "{{ ssh_config_path }}"
+      block: |
+        Host *.{{ customer_name }}.nva
+            ForwardAgent yes
+            User ec2-user
+            IdentityFile {{ identity_file }}
+            ProxyCommand ssh ec2-user@{{ jump_ip }} nc %h %p -w 10

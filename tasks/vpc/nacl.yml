@@ -1,0 +1,32 @@
+--- # AWS ALM VPC Creation
+- hosts: localhost
+  connection: local
+  remote_user: jacopete
+  become: no
+  gather_facts: no
+  vars:
+    image: ami-011b3ccf1bd6db744
+    customer_name: test
+    region: us-east-1
+    ec2_key: LA-us-east-1
+    ssh_config_path: /home/jacopete/.ssh/config
+    identity_file: /home/jacopete/.ssh/LA-us-east-1.pem
+  tasks:
+  - name: Create NACL
+    ec2_vpc_nacl:
+      name: alm-{{ customer_name }}-nacl
+      state: present
+      vpc_id: "{{ vpc_id }}"
+      region: "{{ region }}"
+      subnets:
+        - "{{ public_subnet_id }}"
+        - "{{ private_subnet_id }}"
+        - "{{ db_subnet_1_id }}"
+        - "{{ db_subnet_2_id }}"
+      ingress: [
+        # rule no, protocol, allow/deny, cidr, icmp_code, icmp_type, port from, port to
+        [100, 'all', 'allow', '0.0.0.0/0', null, null, null, null],
+      ]
+      egress: [
+        [100, 'all', 'allow', '0.0.0.0/0', null, null, null, null],
+      ]

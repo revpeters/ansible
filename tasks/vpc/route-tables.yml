@@ -1,0 +1,29 @@
+--- # AWS ALM VPC Creation
+- hosts: localhost
+  connection: local
+  remote_user: jacopete
+  become: no
+  gather_facts: no
+  vars:
+    image: ami-011b3ccf1bd6db744
+    customer_name: test
+    region: us-east-1
+    ec2_key: LA-us-east-1
+    ssh_config_path: /home/jacopete/.ssh/config
+    identity_file: /home/jacopete/.ssh/LA-us-east-1.pem
+  tasks:
+  - name: Create  Route Table
+    ec2_vpc_route_table:
+      tags:
+        Name: alm-{{ customer_name }}-RT
+      state: present
+      vpc_id: "{{ vpc_id }}"
+      region: "{{ region }}"
+      subnets:
+        - "{{ public_subnet_id }}"
+        - "{{ private_subnet_id }}"
+        - "{{ db_subnet_1_id }}"
+        - "{{ db_subnet_2_id }}"
+      routes:
+        - dest: "0.0.0.0/0"
+          gateway_id: "{{ igw_id }}"

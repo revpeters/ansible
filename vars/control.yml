@@ -1,0 +1,21 @@
+--- # Variable for AWS Customers
+customer_name: test
+region: us-east-1
+ami_image: ami-011b3ccf1bd6db744
+ec2_key: LA-us-east-1
+environment: dev # prod non-prod dr dev
+
+atlassian_user: atlasian
+atlassian_group: atlasian
+
+java_version: 1.8.181
+java_home: /data/tools/java/current
+
+jira_version: 7.13.1
+jira_home: /data/atlassian/jira-home
+
+confluence_version: 6.13.3
+confluence_home: /data/atlassian/confluence-home
+
+jira_postgres_driver: postgresql-42.1.1.jar
+confluence_postgres_driver: postgresql-42.1.1.jar

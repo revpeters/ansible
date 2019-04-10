@@ -1,0 +1,82 @@
+--- # AWS ALM VPC Creation
+- hosts: localhost
+  connection: local
+  remote_user: jacopete
+  become: no
+  gather_facts: no
+  vars:
+    ami_image: ami-011b3ccf1bd6db744
+    customer_name: test
+    region: us-east-1
+    ec2_key: LA-us-east-1
+    ssh_config_path: /home/jacopete/.ssh/config
+    identity_file: /home/jacopete/.ssh/LA-us-east-1.pem
+    atlassian_user: atlasian
+    atlassian_group: atlasian
+  tasks:
+  - name: Create Web App EC2 instance
+    ec2:
+      region: "{{ region }}"
+      key_name: "{{ ec2_key }}"
+      image: "{{ ami_image }}"
+      instance_type: t2.micro
+      group_id: "{{ webapps_sg_id }}"
+      vpc_subnet_id: "{{ private_subnet_id }}"
+      assign_public_ip: yes
+      private_ip: 10.0.1.34
+      wait: yes
+      instance_tags:
+        Name: jira.{{ customer_name }}.nva
+    register: jira
+
+  - name: Create Web2 App EC2 instance
+    ec2:
+      region: "{{ region }}"
+      key_name: "{{ ec2_key }}"
+      image: "{{ ami_image }}"
+      instance_type: t2.micro
+      group_id: "{{ webapps_sg_id }}"
+      vpc_subnet_id: "{{ private_subnet_id }}"
+      assign_public_ip: yes
+      private_ip: 10.0.1.64
+      wait: yes
+      instance_tags:
+        Name: conf.{{ customer_name }}.nva
+    register: conf
+
+  - name: Create Bastion EC2 instance
+    ec2:
+      region: "{{ region }}"
+      key_name: "{{ ec2_key }}"
+      image: "{{ ami_image }}"
+      instance_type: t2.micro
+      group_id: "{{ jump_sg_id }}"
+      vpc_subnet_id: "{{ public_subnet_id }}"
+      assign_public_ip: yes
+      private_ip: 10.0.0.132
+      instance_tags:
+        Name: jump.{{ customer_name }}.nva
+      wait: yes
+    register: bastion
+
+  - name: Store bastion IP in jump_ip
+    set_fact:
+      jump_ip: "{{ item.public_ip }}"
+    with_items: "{{ bastion.instances}}"
+
+  - name: Add jumphost to group
+    add_host:
+      hostname: "{{ jump_ip }}"
+      groupname: jumphost
+
+  - name: Add conf to host group
+    add_host:
+      hostname: conf.{{ customer_name }}.nva
+      groupname: conf
+      ansible_ssh_common_args: -o ProxyCommand="ssh ec2-user@{{ jump_ip }} nc %h %p -w 10"
+
+  - name: Add jira to host group
+    add_host:
+      hostname: jira.{{ customer_name }}.nva
+      groupname: jira
+      ansible_ssh_common_args: -o ProxyCommand="ssh ec2-user@{{ jump_ip }} nc %h %p -w 10"

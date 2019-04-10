@@ -1,0 +1,148 @@
+--- # AWS ALM VPC Creation
+- hosts: localhost
+  connection: local
+  remote_user: jacopete
+  become: no
+  gather_facts: no
+  vars:
+    image: ami-011b3ccf1bd6db744
+    customer_name: test
+    region: us-east-1
+    ec2_key: LA-us-east-1
+    ssh_config_path: /home/jacopete/.ssh/config
+    identity_file: /home/jacopete/.ssh/LA-us-east-1.pem
+  tasks:
+  - name: Create Jumphost Security Group
+    ec2_group:
+      name: alm-{{ customer_name }}-jump
+      description: alm-{{ customer_name }}-jump
+      vpc_id: "{{ vpc_id }}"
+      region: "{{ region }}"
+      rules:
+        - proto: "tcp"
+          from_port: "80"
+          to_port: "80"
+          cidr_ip: 0.0.0.0/0
+        - proto: "tcp"
+          ports: 8080
+          cidr_ip:
+            - 128.107.241.0/24
+            - 171.71.174.0/24
+            - 173.38.117.0/24
+            - 64.102.0.0/16
+        - proto: "tcp"
+          ports: 22
+          cidr_ip:
+            - 128.107.241.0/24
+            - 171.70.36.55/32
+            - 171.71.174.0/24
+            - 173.38.117.0/24
+            - 64.102.0.0/16
+            - 64.102.100.220/32
+            - 64.102.100.221/32
+        - proto: "tcp"
+          ports: 6379
+          cidr_ip:
+            - 128.107.241.0/24
+            - 64.102.0.0/16
+            - 173.38.117.0/24
+            - 171.71.174.0/24
+        - proto: "tcp"
+          ports: 8081
+          cidr_ip:
+            - 128.107.241.0/24
+            - 64.102.0.0/16
+            - 173.38.117.0/24
+            - 171.71.174.0/24
+    register: jump_sg
+
+  - name: Set Jump Security Group ID in var
+    set_fact:
+      jump_sg_id: "{{ jump_sg.group_id }}"
+
+  - name: Create WebApps Security Group
+    ec2_group:
+      name: alm-{{ customer_name }}-webapps
+      description: alm-{{ customer_name }}-webapps
+      vpc_id: "{{ vpc_id }}"
+      region: "{{ region }}"
+      rules:
+        - proto: "tcp"
+          ports:
+            - 8443
+            - 80
+            - 443
+            - 8080
+            - 8090
+          cidr_ip: 0.0.0.0/0
+        - proto: "tcp"
+          ports: 22
+          group_id: "{{ jump_sg_id }}"
+    register: webapps_sg
+
+  - name: Set WebApps Group ID in var
+    set_fact:
+      webapps_sg_id: "{{ webapps_sg.group_id }}"
+
+  - name: Create Database Security Group
+    ec2_group:
+      name: alm-{{ customer_name }}-db
+      description: alm-{{ customer_name }}-db
+      vpc_id: "{{ vpc_id }}"
+      region: "{{ region }}"
+      rules:
+        - proto: "tcp"
+          ports: 5432
+          group_id: "{{ webapps_sg_id }}"
+        - proto: "tcp"
+          ports:
+            - 22
+            - 6739
+          group_id: "{{ jump_sg_id }}"
+        - proto: "tcp"
+          ports: 5493
+          cidr_ip: 0.0.0.0/0
+    register: database_sg
+
+  - name: Create Kali Security Group
+    ec2_group:
+      name: alm-{{ customer_name }}-kali
+      description: alm-{{ customer_name }}-kali
+      vpc_id: "{{ vpc_id }}"
+      region: "{{ region }}"
+      rules:
+        - proto: "tcp"
+          ports: 22
+          cidr_ip: 0.0.0.0/0
+        - proto: "tcp"
+          ports: 80
+          group_id: "{{ jump_sg_id }}"
+        - proto: "tcp"
+          ports: 443
+          cidr_ip: 0.0.0.0/0
+    register: kali_sg
+
+  - name: Create Monitor Security Group
+    ec2_group:
+      name: alm-{{ customer_name }}-monitor
+      description: alm-{{ customer_name }}-monitor
+      vpc_id: "{{ vpc_id }}"
+      region: "{{ region }}"
+      rules:
+        - proto: "tcp"
+          ports: 22
+          group_id: "{{ jump_sg_id }}"
+        - proto: "tcp"
+          ports:
+            - 5044
+            - 9200
+          group_id: "{{ webapps_sg_id }}"
+        - proto: "tcp"
+          ports:
+            - 5601
+          cidr_ip:
+            - 128.107.241.0/24
+            - 171.71.174.0/24
+            - 173.38.117.0/24
+            - 64.102.0.0/16
+    register: monitor_sg
