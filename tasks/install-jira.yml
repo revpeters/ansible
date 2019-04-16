@@ -105,13 +105,13 @@
       lineinfile:
         path: /home/atlasian/.bash_profile
         insertbefore: 'export PATH'
-        line: 'export JAVA_HOME=/data/tools/java/current'
+        line: 'export JAVA_HOME={{ java_home }}'
 
     - name: update setenv.sh with JIRA_HOME
       lineinfile:
-        path: /data/atlassian/jira/current/bin/setenv.sh
+        path: "{{ jira_install_dir }}/current/bin/setenv.sh"
         regexp: '^#JIRA_HOME='
-        line: 'JIRA_HOME="/data/atlassian/jira-home"'
+        line: 'JIRA_HOME="{{ jira_home }}"'
 
     - name: Start HTTPD
       service:

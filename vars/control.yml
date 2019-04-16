@@ -1,9 +1,11 @@
 --- # Variable for AWS Customers
+#AWS_SECRET_ACCESS_KEY: ......  store in vault
+#AWS_ACCESS_KEY_ID: ....... store in vault
 customer_name: test
 environment: dev # prod non-prod dr dev
 region: us-east-1
 ami_image: ami-011b3ccf1bd6db744
-ec2_key: LA-us-east-1
+ec2_key: LA-us-east-1 #store in vault
 ssh_config_path: /home/jacopete/.ssh/config
 identity_file: /home/jacopete/.ssh/LA-us-east-1.pem
 
@@ -19,10 +21,12 @@ jira_version: atlassian-jira-software-7.13.1
 jira_install_dir: /data/atlassian/jira
 jira_home: /data/atlassian/jira-home
 jira_download_url: https://www.atlassian.com/software/jira/downloads/binary/atlassian-jira-software-7.13.1.tar.gz
+jira_ec2_size: 300
 
-confluence_version: 6.13.3
+confluence_version: atlassian-confluence-6.14.3
 confluence_install_dir: /data/atlassian/confluence
 confluence_home: /data/atlassian/confluence-home
+confluence_download_url: https://www.atlassian.com/software/confluence/downloads/binary/atlassian-confluence-6.14.3.tar.gz
+confluence_ec2_size: 300
 
-postgres_driver: postgresql-42.1.1.jar
 postgres_driver: postgresql-42.1.1.jar

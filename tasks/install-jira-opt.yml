@@ -57,7 +57,7 @@
 
     - name: Remove 9.4.1212 pgres driver
       file:
-        path: "{{ jira_install_dir }}/current/current/lib/postgresql-9.4.1212.jar"
+        path: "{{ jira_install_dir }}/current/lib/postgresql-9.4.1212.jar"
         state: absent
 
     - name: download 42.2.1 pgres driver
@@ -72,13 +72,13 @@
       lineinfile:
         path: "/home/{{ atlassian_user }}/.bash_profile"
         insertbefore: 'export PATH'
-        line: 'export JAVA_HOME=/data/tools/java/current'
+        line: 'export JAVA_HOME={{ java_home }}'
 
     - name: update setenv.sh with JIRA_HOME
       lineinfile:
         path: "{{ jira_install_dir }}/current/bin/setenv.sh"
         regexp: '^#JIRA_HOME='
-        line: 'JIRA_HOME="/data/atlassian/jira-home"'
+        line: 'JIRA_HOME="{{ jira_home }}"'
 
     - name: Start HTTPD
       service:
@@ -86,5 +86,5 @@
         state: started
 
     - name: Start JIRA
-      command: su - atlasian -c "/data/atlassian/jira/atlassian-jira-software-7.13.1-standalone/bin/start-jira.sh"
+      command: su - atlasian -c "{{ jira_home }}/current/bin/start-jira.sh"
 
