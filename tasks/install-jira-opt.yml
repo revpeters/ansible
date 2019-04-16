@@ -1,0 +1,90 @@
+--- # Install jira on an AW EC2 instance
+- hosts: jira
+  connection: ssh
+  remote_user: ec2-user
+  become: yes
+  gather_facts: yes
+  vars_files:
+    - ../vars/control.yml
+  tasks:
+    - name: Install httpd
+      yum:
+        name: "{{ item }}"
+      with_items:
+        - httpd
+
+    - name: Create jira, jira-home, java
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ atlassian_user }}"
+        group: "{{ atlassian_group }}"
+        mode: 0755
+      with_items:
+        - "{{ jira_install_dir }}"
+        - "{{ java_install_dir }}"
+        - "{{ jira_home }}"
+
+    # Download and install JIRA
+    - name: Download JIRA and JAVA tar balls
+      get_url:
+        url: "{{ item.url }}"
+        dest: "{{ item.dest }}"
+        mode: 0777
+      with_items:
+        - { url: "{{ jira_download_url }}", dest: "{{ jira_install_dir }}" }
+        - { url: "{{ java_download_url }}", dest: "{{ java_install_dir }}" }
+
+    - name: Untar JIRA and JAVA
+      unarchive:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: "{{ atlassian_user }}"
+        group: "{{ atlassian_group }}"
+        remote_src: yes
+      with_items:
+        - { src: "{{ jira_install_dir }}/atlassian-jira-software-7.13.1.tar.gz", dest: "{{ jira_install_dir }}" }
+        - { src: "{{ java_install_dir }}/jdk-8u181-linux-x64.tar.gz", dest: "{{ java_install_dir }}" }
+
+    - name: Symlink JIRA and JAVA to current
+      file:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        state: link
+      with_items:
+        - { src: "{{ jira_install_dir }}/{{ jira_version }}-standalone", dest: "{{ jira_install_dir }}/current" }
+        - { src: "{{ java_install_dir }}/{{ java_version }}", dest: "{{ java_install_dir }}/current" }
+
+    - name: Remove 9.4.1212 pgres driver
+      file:
+        path: "{{ jira_install_dir }}/current/current/lib/postgresql-9.4.1212.jar"
+        state: absent
+
+    - name: download 42.2.1 pgres driver
+      get_url:
+        url: https://jdbc.postgresql.org/download/postgresql-42.1.1.jar
+        dest: "{{ jira_install_dir }}/current/lib/"
+        owner: "{{ atlassian_user }}"
+        group: "{{ atlassian_group }}"
+        mode: 0544
+
+    - name: Update JAVA_HOME
+      lineinfile:
+        path: "/home/{{ atlassian_user }}/.bash_profile"
+        insertbefore: 'export PATH'
+        line: 'export JAVA_HOME=/data/tools/java/current'
+
+    - name: update setenv.sh with JIRA_HOME
+      lineinfile:
+        path: "{{ jira_install_dir }}/current/bin/setenv.sh"
+        regexp: '^#JIRA_HOME='
+        line: 'JIRA_HOME="/data/atlassian/jira-home"'
+
+    - name: Start HTTPD
+      service:
+        name: httpd
+        state: started
+
+    - name: Start JIRA
+      command: su - atlasian -c "/data/atlassian/jira/atlassian-jira-software-7.13.1-standalone/bin/start-jira.sh"
+

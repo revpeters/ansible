@@ -1,0 +1,25 @@
+--- # AWS ALM VPC Creation
+- hosts: localhost
+  connection: local
+  remote_user: jacopete
+  become: no
+  gather_facts: no
+  vars:
+    ami_image: ami-011b3ccf1bd6db744
+    customer_name: test
+    region: us-east-1
+    ec2_key: LA-us-east-1
+    ssh_config_path: /home/jacopete/.ssh/config
+    identity_file: /home/jacopete/.ssh/LA-us-east-1.pem
+    atlassian_user: atlasian
+    atlassian_group: atlasian
+  tasks:
+  - name: Create RDS Subnet Group
+    rds_subnet_group:
+      region: "{{ region }}"
+      state: present
+      name: alm-{{ customer_name }}-rds-subnetgroup
+      description: Subnet Group for {{ customer_name }} RDS instance
+      subnets:
+        - "{{ db_subnet_1_id }}"
+        - "{{ db_subnet_2_id }}"

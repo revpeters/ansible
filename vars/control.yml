@@ -1,21 +1,28 @@
 --- # Variable for AWS Customers
 customer_name: test
+environment: dev # prod non-prod dr dev
 region: us-east-1
 ami_image: ami-011b3ccf1bd6db744
 ec2_key: LA-us-east-1
-environment: dev # prod non-prod dr dev
+ssh_config_path: /home/jacopete/.ssh/config
+identity_file: /home/jacopete/.ssh/LA-us-east-1.pem
 
 atlassian_user: atlasian
 atlassian_group: atlasian
 
-java_version: 1.8.181
+java_version: jdk1.8.0_181
+java_install_dir: /data/tools/java
 java_home: /data/tools/java/current
+java_download_url: https://github.com/frekele/oracle-java/releases/download/8u181-b13/jdk-8u181-linux-x64.tar.gz
 
-jira_version: 7.13.1
+jira_version: atlassian-jira-software-7.13.1
+jira_install_dir: /data/atlassian/jira
 jira_home: /data/atlassian/jira-home
+jira_download_url: https://www.atlassian.com/software/jira/downloads/binary/atlassian-jira-software-7.13.1.tar.gz
 
 confluence_version: 6.13.3
+confluence_install_dir: /data/atlassian/confluence
 confluence_home: /data/atlassian/confluence-home
 
-jira_postgres_driver: postgresql-42.1.1.jar
-confluence_postgres_driver: postgresql-42.1.1.jar
+postgres_driver: postgresql-42.1.1.jar
+postgres_driver: postgresql-42.1.1.jar

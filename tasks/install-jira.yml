@@ -14,18 +14,11 @@
     atlassian_user: atlasian
     atlassian_group: atlasian
   tasks:
-    - name: Install httpd and java
+    - name: Install httpd
       yum:
         name: "{{ item }}"
       with_items:
         - httpd
-        - java
-
-    - name: Update JAVA_HOME
-      lineinfile:
-        path: /home/atlasian/.bash_profile
-        insertbefore: 'export PATH'
-        line: 'export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.201.b09-2.el7_6.x86_64/jre/'
 
     - name: Create jira FS
       file:
@@ -43,7 +36,16 @@
         state: directory
         mode: 0700
 
-    - name: download tar ball
+    - name : Create java file system
+      file:
+        path: /data/tools/java
+        owner: atlasian
+        group: atlasian
+        state: directory
+        mode: 0755
+
+    # Download and install JIRA
+    - name: download JIRA tar ball
       get_url:
         url: https://www.atlassian.com/software/jira/downloads/binary/atlassian-jira-software-7.13.1.tar.gz
         dest: /data/atlassian/jira
@@ -57,22 +59,57 @@
         group: atlasian
         remote_src: yes
 
+    - name: Symlink JIRA to current
+      file:
+        src: /data/atlassian/jira/atlassian-jira-software-7.13.1-standalone
+        dest: /data/atlassian/jira/current
+        state: link
+
     - name: Remove 9.4.1212 pgres driver
       file:
-        path: /data/atlassian/jira/atlassian-jira-software-7.13.1-standalone/lib/postgresql-9.4.1212.jar
+        path: /data/atlassian/jira/current/lib/postgresql-9.4.1212.jar
         state: absent
 
     - name: download 42.2.1 pgres driver
       get_url:
         url: https://jdbc.postgresql.org/download/postgresql-42.1.1.jar
-        dest: /data/atlassian/jira/atlassian-jira-software-7.13.1-standalone/lib/
+        dest: /data/atlassian/jira/current/lib/
         owner: atlasian
         group: atlasian
         mode: 0544
 
+    # Download and install JAVA
+    - name: download JAVA tar ball
+      copy:
+        src: ../files/jdk-8u181-linux-x64.tar.gz
+        dest: /data/tools/java
+        owner: atlasian
+        group: atlasian
+        mode: 0777
+
+    - name: Untar JAVA
+      unarchive:
+        src: /data/tools/java/jdk-8u181-linux-x64.tar.gz
+        dest: /data/tools/java
+        owner: atlasian
+        group: atlasian
+        remote_src: yes
+
+    - name: Symlink JAVA to current
+      file:
+        src: /data/tools/java/jdk1.8.0_181
+        dest: /data/tools/java/current
+        state: link
+
+    - name: Update JAVA_HOME
+      lineinfile:
+        path: /home/atlasian/.bash_profile
+        insertbefore: 'export PATH'
+        line: 'export JAVA_HOME=/data/tools/java/current'
+
     - name: update setenv.sh with JIRA_HOME
       lineinfile:
-        path: /data/atlassian/jira/atlassian-jira-software-7.13.1-standalone/bin/setenv.sh
+        path: /data/atlassian/jira/current/bin/setenv.sh
         regexp: '^#JIRA_HOME='
         line: 'JIRA_HOME="/data/atlassian/jira-home"'
 
@@ -83,3 +120,4 @@
 
     - name: Start JIRA
       command: su - atlasian -c "/data/atlassian/jira/atlassian-jira-software-7.13.1-standalone/bin/start-jira.sh"
+

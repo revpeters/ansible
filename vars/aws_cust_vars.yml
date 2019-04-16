@@ -1,4 +1,0 @@
---- # Variable for AWS Customers
-customer_name: test
-region: us-east-1
-ssh_config_path: /home/jacopete/.ssh/config

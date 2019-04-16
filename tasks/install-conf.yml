@@ -14,12 +14,11 @@
     atlassian_user: atlasian
     atlassian_group: atlasian
   tasks:
-    - name: Install httpd and java
+    - name: Install httpd
       yum:
         name: "{{ item }}"
       with_items:
         - httpd
-        - java
 
     - name: Update JAVA_HOME
       lineinfile:

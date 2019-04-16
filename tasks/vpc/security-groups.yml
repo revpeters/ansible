@@ -104,6 +104,10 @@
           cidr_ip: 0.0.0.0/0
     register: database_sg
 
+  - name: Set Database Security Group ID in var
+    set_fact:
+      database_sg_id: "{{ database_sg.group_id }}"
+
   - name: Create Kali Security Group
     ec2_group:
       name: alm-{{ customer_name }}-kali
