@@ -1,5 +1,5 @@
---- # Install jira on an AW EC2 instance
-- hosts: jira
+--- # Install confluence on an AW EC2 instance
+- hosts: conf
   connection: ssh
   remote_user: ec2-user
   become: yes
@@ -13,7 +13,7 @@
       with_items:
         - httpd
 
-    - name: Create jira, jira-home, java
+    - name: Create confluence, confluence-home, java
       file:
         path: "{{ item }}"
         state: directory
@@ -21,21 +21,20 @@
         group: "{{ atlassian_group }}"
         mode: 0755
       with_items:
-        - "{{ jira_install_dir }}"
+        - "{{ confluence_install_dir }}"
         - "{{ java_install_dir }}"
-        - "{{ jira_home }}"
+        - "{{ confluence_home }}"
 
-    # Download and install JIRA
-    - name: Download JIRA and JAVA tar balls
+    - name: Download CONFLUENCE and JAVA tar balls
       get_url:
         url: "{{ item.url }}"
         dest: "{{ item.dest }}"
         mode: 0777
       with_items:
-        - { url: "{{ jira_download_url }}", dest: "{{ jira_install_dir }}" }
+        - { url: "{{ confluence_download_url }}", dest: "{{ confluence_install_dir }}" }
         - { url: "{{ java_download_url }}", dest: "{{ java_install_dir }}" }
 
-    - name: Untar JIRA and JAVA
+    - name: Untar CONFLUENCE and JAVA
       unarchive:
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"
@@ -43,30 +42,17 @@
         group: "{{ atlassian_group }}"
         remote_src: yes
       with_items:
-        - { src: "{{ jira_install_dir }}/atlassian-jira-software-7.13.1.tar.gz", dest: "{{ jira_install_dir }}" }
+        - { src: "{{ confluence_install_dir }}/{{ confluence_version }}.tar.gz", dest: "{{ confluence_install_dir }}" }
         - { src: "{{ java_install_dir }}/jdk-8u181-linux-x64.tar.gz", dest: "{{ java_install_dir }}" }
 
-    - name: Symlink JIRA and JAVA to current
+    - name: Symlink CONFLUENCE and JAVA to current
       file:
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"
         state: link
       with_items:
-        - { src: "{{ jira_install_dir }}/{{ jira_version }}-standalone", dest: "{{ jira_install_dir }}/current" }
+        - { src: "{{ confluence_install_dir }}/{{ confluence_version }}", dest: "{{ confluence_install_dir }}/current" }
         - { src: "{{ java_install_dir }}/{{ java_version }}", dest: "{{ java_install_dir }}/current" }
-
-    - name: Remove 9.4.1212 pgres driver
-      file:
-        path: "{{ jira_install_dir }}/current/lib/postgresql-9.4.1212.jar"
-        state: absent
-
-    - name: download 42.2.1 pgres driver
-      get_url:
-        url: https://jdbc.postgresql.org/download/postgresql-42.1.1.jar
-        dest: "{{ jira_install_dir }}/current/lib/"
-        owner: "{{ atlassian_user }}"
-        group: "{{ atlassian_group }}"
-        mode: 0544
 
     - name: Update JAVA_HOME
       lineinfile:
@@ -74,17 +60,17 @@
         insertbefore: 'export PATH'
         line: 'export JAVA_HOME={{ java_home }}'
 
-    - name: update setenv.sh with JIRA_HOME
+    - name: Update init.properties with confluence-home
       lineinfile:
-        path: "{{ jira_install_dir }}/current/bin/setenv.sh"
-        regexp: '^#JIRA_HOME='
-        line: 'JIRA_HOME="{{ jira_home }}"'
+        path: /data/atlassian/confluence/current/confluence/WEB-INF/classes/confluence-init.properties
+        regexp: '^# confluence.home='
+        line: 'confluence.home="/data/atlassian/confluence-home"'
 
     - name: Start HTTPD
       service:
         name: httpd
         state: started
 
-    - name: Start JIRA
-      command: su - atlasian -c "{{ jira_install_dir }}/current/bin/start-jira.sh"
+    - name: Start confluence
+      command: su - atlasian -c "{{ confluence_install_dir }}/current/bin/start-confluence.sh"
 
