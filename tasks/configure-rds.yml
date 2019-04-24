@@ -1,0 +1,26 @@
+--- # AWS ALM VPC Creation
+- hosts: localhost
+  connection: local
+  remote_user: jacopete
+  become: no
+  gather_facts: no
+  vars_files:
+    - ../vars/control.yml
+  tasks:
+  - name: Configure JIRA database
+    rds:
+      command: create
+      subnet: alm-{{ customer_name }}-rds-subnetgroup
+      vpc_security_groups: "{{ database_sg_id }}"
+      region: "{{ region }}"
+      publicly_accessible: no
+      instance_name: rds-{{ customer_name }}-nva
+      db_engine: postgres
+      engine_version: 9.6.11
+      size: 20
+      instance_type: db.t2.micro
+      username: alm-test-rds01
+      password: alm-test-rds01
+      tags:
+        Environment: alm-test-rds-creation
+        Application: Atlassian

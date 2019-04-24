@@ -2,6 +2,6 @@
 - import_playbook: tasks/create-vpc.yml
 - import_playbook: tasks/bastion-config.yml
 - import_playbook: tasks/create-atlasian-user.yml
-#- import_playbook: tasks/rds-endpoint.yml
+- import_playbook: tasks/create-postgres-user.yml
 - import_playbook: tasks/install-jira-opt.yml
 - import_playbook: tasks/install-conf-opt.yml

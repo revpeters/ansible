@@ -7,7 +7,7 @@
   vars_files:
     - ../vars/control.yml
   tasks:
-    - name: Install httpd
+    - name: Install HTTPD
       yum:
         name: "{{ item }}"
       with_items:
@@ -50,6 +50,9 @@
       file:
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"
+        owner: "{{ atlassian_user }}"
+        group: "{{ atlassian_group }}"
+        mode: 0755
         state: link
       with_items:
         - { src: "{{ jira_install_dir }}/{{ jira_version }}-standalone", dest: "{{ jira_install_dir }}/current" }
@@ -87,4 +90,3 @@
 
     - name: Start JIRA
       command: su - atlasian -c "{{ jira_install_dir }}/current/bin/start-jira.sh"
-

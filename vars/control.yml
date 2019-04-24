@@ -4,13 +4,23 @@
 customer_name: test
 environment: dev # prod non-prod dr dev
 region: us-east-1
-ami_image: ami-011b3ccf1bd6db744
+r53_zone:
+  jira: magentasuspenders.com
+  conf: moatsneedboats.com
+app_ami_image: ami-011b3ccf1bd6db744
+db_ami_image: ami-011b3ccf1bd6db744
+jump_instance_type: t2.micro
+app_instance_type: t2.micro
+db_instance_type: t2.micro
 ec2_key: LA-us-east-1 #store in vault
 ssh_config_path: /home/jacopete/.ssh/config
 identity_file: /home/jacopete/.ssh/LA-us-east-1.pem
 
 atlassian_user: atlasian
 atlassian_group: atlasian
+
+postgres_user: postgres
+postgres_group: postgres
 
 java_version: jdk1.8.0_181
 java_install_dir: /data/tools/java
@@ -30,3 +40,11 @@ confluence_download_url: https://www.atlassian.com/software/confluence/downloads
 confluence_ec2_size: 300
 
 postgres_driver: postgresql-42.1.1.jar
+rds_engine: postgres
+rds_version: 9.6.11
+rds_endpoint:
+size: 10
+instance_type: db.t2.micro
+db_name: jiratest01
+username: jiratest01
+password: jiratest01

@@ -1,0 +1,28 @@
+--- # AWS ALM VPC Creation
+- hosts: localhost
+  connection: local
+  remote_user: jacopete
+  become: no
+  gather_facts: no
+  vars_files:
+    - ../../vars/control.yml
+  tasks:
+  - name: Create Route 53 A record
+    route53:
+      state: present
+      overwrite: yes
+      zone: "{{ r53_zone.jira }}"
+      record: test-jira.{{ r53_zone.jira }}
+      type: A
+      value:
+        - "{{ jira_ip }}"
+
+  - name: Create Route 53 A record
+    route53:
+      state: present
+      overwrite: yes
+      zone: "{{ r53_zone.conf }}"
+      record: test-conf.{{ r53_zone.conf }}
+      type: A
+      value:
+        - "{{ conf_ip }}"

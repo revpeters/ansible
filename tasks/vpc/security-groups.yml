@@ -4,13 +4,8 @@
   remote_user: jacopete
   become: no
   gather_facts: no
-  vars:
-    image: ami-011b3ccf1bd6db744
-    customer_name: test
-    region: us-east-1
-    ec2_key: LA-us-east-1
-    ssh_config_path: /home/jacopete/.ssh/config
-    identity_file: /home/jacopete/.ssh/LA-us-east-1.pem
+  vars_files:
+    - ../../vars/control.yml
   tasks:
   - name: Create Jumphost Security Group
     ec2_group:

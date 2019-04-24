@@ -1,5 +1,5 @@
 --- # Create atlasian user on both app hosts
-- hosts: jira,conf
+- hosts: pgres
   connection: ssh
   remote_user: ec2-user
   become: yes
@@ -7,13 +7,13 @@
   vars_files:
     - ../vars/control.yml
   tasks:
-    - name: Create Atlasian group
+    - name: Create Postgres group
       group:
-        name: "{{ atlassian_group }}"
+        name: "{{ postgres_group }}"
         state: present
 
-    - name: Create Atlasian user
+    - name: Create Postgres user
       user:
-        name: "{{ atlassian_user }}"
-        group: "{{ atlassian_group }}"
+        name: "{{ postgres_user }}"
+        group: "{{ postgres_group }}"
         shell: /bin/bash

@@ -4,22 +4,15 @@
   remote_user: jacopete
   become: no
   gather_facts: no
-  vars:
-    ami_image: ami-011b3ccf1bd6db744
-    customer_name: test
-    region: us-east-1
-    ec2_key: LA-us-east-1
-    ssh_config_path: /home/jacopete/.ssh/config
-    identity_file: /home/jacopete/.ssh/LA-us-east-1.pem
-    atlassian_user: atlasian
-    atlassian_group: atlasian
+  vars_files:
+    - ../../vars/control.yml
   tasks:
-  - name: Create Web App EC2 instance
+  - name: Create JIRA EC2 instance
     ec2:
       region: "{{ region }}"
       key_name: "{{ ec2_key }}"
-      image: "{{ ami_image }}"
-      instance_type: t2.micro
+      image: "{{ app_ami_image }}"
+      instance_type: "{{ app_instance_type }}"
       group_id: "{{ webapps_sg_id }}"
       vpc_subnet_id: "{{ private_subnet_id }}"
       assign_public_ip: yes
@@ -29,12 +22,12 @@
         Name: jira.{{ customer_name }}.nva
     register: jira
 
-  - name: Create Web2 App EC2 instance
+  - name: Create CONFLUENCE EC2 instance
     ec2:
       region: "{{ region }}"
       key_name: "{{ ec2_key }}"
-      image: "{{ ami_image }}"
-      instance_type: t2.micro
+      image: "{{ app_ami_image }}"
+      instance_type: "{{ app_instance_type }}"
       group_id: "{{ webapps_sg_id }}"
       vpc_subnet_id: "{{ private_subnet_id }}"
       assign_public_ip: yes
@@ -48,8 +41,8 @@
     ec2:
       region: "{{ region }}"
       key_name: "{{ ec2_key }}"
-      image: "{{ ami_image }}"
-      instance_type: t2.micro
+      image: "{{ app_ami_image }}"
+      instance_type: "{{ jump_instance_type }}"
       group_id: "{{ jump_sg_id }}"
       vpc_subnet_id: "{{ public_subnet_id }}"
       assign_public_ip: yes
@@ -62,7 +55,17 @@
   - name: Store bastion IP in jump_ip
     set_fact:
       jump_ip: "{{ item.public_ip }}"
-    with_items: "{{ bastion.instances}}"
+    with_items: "{{ bastion.instances }}"
+
+  - name: Store jira IP in jira_ip
+    set_fact:
+      jira_ip: "{{ item.public_ip }}"
+    with_items: "{{ jira.instances }}"
+
+  - name: Store conf IP in conf_ip
+    set_fact:
+      conf_ip: "{{ item.public_ip }}"
+    with_items: "{{ conf.instances }}"
 
   - name: Add jumphost to group
     add_host:

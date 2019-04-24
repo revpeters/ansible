@@ -1,0 +1,86 @@
+--- # AWS ALM VPC Creation
+- hosts: localhost
+  connection: local
+  remote_user: jacopete
+  become: no
+  gather_facts: no
+  vars_files:
+    - ../../vars/control.yml
+  tasks:
+  - name: Create Pgpool EC2 instance
+    ec2:
+      region: "{{ region }}"
+      key_name: "{{ ec2_key }}"
+      image: "{{ db_ami_image }}"
+      instance_type: "{{ db_instance_type }}"
+      group_id: "{{ database_sg_id }}"
+      vpc_subnet_id: "{{ db_subnet_1_id }}"
+      assign_public_ip: no
+      private_ip: 10.0.2.13
+      wait: yes
+      instance_tags:
+        Name: pgpool.{{ customer_name }}.nva
+    register: pgpool
+
+  - name: Create Pgres1 EC2 instance
+    ec2:
+      region: "{{ region }}"
+      key_name: "{{ ec2_key }}"
+      image: "{{ db_ami_image }}"
+      instance_type: "{{ db_instance_type }}"
+      group_id: "{{ database_sg_id }}"
+      vpc_subnet_id: "{{ db_subnet_1_id }}"
+      assign_public_ip: no
+      private_ip: 10.0.2.11
+      wait: yes
+      instance_tags:
+        Name: pgres1.{{ customer_name }}.nva
+    register: pgres1
+
+  - name: Create Pgres2 EC2 instance
+    ec2:
+      region: "{{ region }}"
+      key_name: "{{ ec2_key }}"
+      image: "{{ db_ami_image }}"
+      instance_type: "{{ db_instance_type }}"
+      group_id: "{{ database_sg_id }}"
+      vpc_subnet_id: "{{ db_subnet_1_id }}"
+      assign_public_ip: no
+      private_ip: 10.0.2.12
+      instance_tags:
+        Name: pgres2.{{ customer_name }}.nva
+      wait: yes
+    register: pgres2
+
+  - name: Store pgpool IP in pgpool_ip
+    set_fact:
+      pgpool_ip: "{{ item.public_ip }}"
+    with_items: "{{ pgpool.instances }}"
+
+  - name: Store pgres1 IP in pgres1_ip
+    set_fact:
+      pgres1_ip: "{{ item.public_ip }}"
+    with_items: "{{ pgres1.instances }}"
+
+  - name: Store pgres2 IP in pgres2_ip
+    set_fact:
+      pgres2_ip: "{{ item.public_ip }}"
+    with_items: "{{ pgres2.instances }}"
+
+  - name: Add pgpool to host group
+    add_host:
+      hostname: pgpool.{{ customer_name }}.nva
+      groupname: pgres
+      ansible_ssh_common_args: -o ProxyCommand="ssh ec2-user@{{ jump_ip }} nc %h %p -w 10"
+
+  - name: Add pgres1 to host group
+    add_host:
+      hostname: pgres1.{{ customer_name }}.nva
+      groupname: pgres
+      ansible_ssh_common_args: -o ProxyCommand="ssh ec2-user@{{ jump_ip }} nc %h %p -w 10"
+
+  - name: Add pgres2 to host group
+    add_host:
+      hostname: pgres2.{{ customer_name }}.nva
+      groupname: pgres
+      ansible_ssh_common_args: -o ProxyCommand="ssh ec2-user@{{ jump_ip }} nc %h %p -w 10"
