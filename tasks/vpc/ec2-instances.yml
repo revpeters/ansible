@@ -11,8 +11,8 @@
     ec2:
       region: "{{ region }}"
       key_name: "{{ ec2_key }}"
-      image: "{{ app_ami_image }}"
-      instance_type: "{{ app_instance_type }}"
+      image: "{{ app_image }}"
+      instance_type: "{{ instance_type }}"
       group_id: "{{ webapps_sg_id }}"
       vpc_subnet_id: "{{ private_subnet_id }}"
       assign_public_ip: yes
@@ -26,8 +26,8 @@
     ec2:
       region: "{{ region }}"
       key_name: "{{ ec2_key }}"
-      image: "{{ app_ami_image }}"
-      instance_type: "{{ app_instance_type }}"
+      image: "{{ app_image }}"
+      instance_type: "{{ instance_type }}"
       group_id: "{{ webapps_sg_id }}"
       vpc_subnet_id: "{{ private_subnet_id }}"
       assign_public_ip: yes
@@ -41,8 +41,8 @@
     ec2:
       region: "{{ region }}"
       key_name: "{{ ec2_key }}"
-      image: "{{ app_ami_image }}"
-      instance_type: "{{ jump_instance_type }}"
+      image: "{{ jump_image }}"
+      instance_type: "{{ instance_type }}"
       group_id: "{{ jump_sg_id }}"
       vpc_subnet_id: "{{ public_subnet_id }}"
       assign_public_ip: yes

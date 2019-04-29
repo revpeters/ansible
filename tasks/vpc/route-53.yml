@@ -12,7 +12,7 @@
       state: present
       overwrite: yes
       zone: "{{ r53_zone.jira }}"
-      record: test-jira.{{ r53_zone.jira }}
+      record: "{{ customer_name }}"-jira.{{ r53_zone.jira }}
       type: A
       value:
         - "{{ jira_ip }}"
@@ -22,7 +22,7 @@
       state: present
       overwrite: yes
       zone: "{{ r53_zone.conf }}"
-      record: test-conf.{{ r53_zone.conf }}
+      record: "{{ customer_name }}"-conf.{{ r53_zone.conf }}
       type: A
       value:
         - "{{ conf_ip }}"

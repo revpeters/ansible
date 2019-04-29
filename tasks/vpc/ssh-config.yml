@@ -14,5 +14,5 @@
         Host *.{{ customer_name }}.nva
             ForwardAgent yes
             User ec2-user
-            IdentityFile {{ identity_file }}
+            IdentityFile {{ ec2_key }}.pem
             ProxyCommand ssh ec2-user@{{ jump_ip }} nc %h %p -w 10

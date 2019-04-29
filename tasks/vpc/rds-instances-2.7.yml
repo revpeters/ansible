@@ -8,17 +8,19 @@
     - ../../vars/control.yml
   tasks:
   - name: Create RDS postgreSQL instance
-    rds:
+    rds_instance:
       command: create
-      subnet: alm-{{ customer_name }}-rds-subnetgroup
-      vpc_security_groups: "{{ database_sg_id }}"
+      db_subnet_group_name: alm-{{ customer_name }}-rds-subnetgroup
+      vpc_security_group_ids: "{{ database_sg_id }}"
       region: "{{ region }}"
       publicly_accessible: no
-      instance_name: jira-rds-{{ customer_name }}-nva
-      db_engine: postgres
+      db_instance_identifier: jira-rds-{{ customer_name }}-nva
+      engine: postgres
       engine_version: 9.6.11
-      size: 10
-      instance_type: "{{ rds_instance_type }}"
+      allocated_storage: 20
+      storage_encrypted: True
+      storage_type: gp2
+      instance_type: db.t2.micro
       db_name: jiratest01
       username: jiratest01
       password: jiratest01
@@ -27,17 +29,19 @@
         Application: Atlassian
 
   - name: Create CONF rds instance
-    rds:
-      command: create
-      subnet: alm-{{ customer_name }}-rds-subnetgroup
-      vpc_security_groups: "{{ database_sg_id }}"
+    rds_instance:
+      state: present
+      db_subnet_group_name: alm-{{ customer_name }}-rds-subnetgroup
+      vpc_security_group_ids: "{{ database_sg_id }}"
       region: "{{ region }}"
       publicly_accessible: no
-      instance_name: conf-rds-{{ customer_name }}-nva
-      db_engine: postgres
+      db_instance_identifier: conf-rds-{{ customer_name }}-nva
+      engine: postgres
       engine_version: 9.6.11
-      size: 10
-      instance_type: "{{ rds_instance_type }}"
+      allocated_storage: 20
+      storage_encrypted: True
+      storage_type: gp2
+      instance_type: db.t2.micro
       db_name: conftest01
       username: conftest01
       password: conftest01

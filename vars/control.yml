@@ -1,20 +1,22 @@
 --- # Variable for AWS Customers
 #AWS_SECRET_ACCESS_KEY: ......  store in vault
 #AWS_ACCESS_KEY_ID: ....... store in vault
-customer_name: test
-environment: dev # prod non-prod dr dev
+customer_name: pocRDS
+#environment: dev # prod non-prod dr dev
 region: us-east-1
 r53_zone:
-  jira: magentasuspenders.com
-  conf: moatsneedboats.com
-app_ami_image: ami-011b3ccf1bd6db744
-db_ami_image: ami-011b3ccf1bd6db744
-jump_instance_type: t2.micro
-app_instance_type: t2.micro
-db_instance_type: t2.micro
-ec2_key: LA-us-east-1 #store in vault
+  jira: engit-alm.com
+  conf: engit-alm.com
+
+app_image: ami-011b3ccf1bd6db744
+jump_image: ami-011b3ccf1bd6db744
+db_image: ami-011b3ccf1bd6db744
+
+instance_type: t2.micro
+
+ec2_key: LA-us-east-1
+
 ssh_config_path: /home/jacopete/.ssh/config
-identity_file: /home/jacopete/.ssh/LA-us-east-1.pem
 
 atlassian_user: atlasian
 atlassian_group: atlasian
@@ -43,8 +45,14 @@ postgres_driver: postgresql-42.1.1.jar
 rds_engine: postgres
 rds_version: 9.6.11
 rds_endpoint:
-size: 10
-instance_type: db.t2.micro
-db_name: jiratest01
-username: jiratest01
-password: jiratest01
+rds_size: 300
+rds_instance_type: db.t2.micro
+db_name:
+  jira: jiratest01
+  conf: conftest01
+username:
+  jira: jiratest01
+  conf: conftest01
+password:
+  jira: jiratest01
+  conf: conftest01
