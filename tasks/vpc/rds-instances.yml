@@ -10,11 +10,11 @@
   - name: Create RDS postgreSQL instance
     rds:
       command: create
-      subnet: alm-{{ customer_name }}-rds-subnetgroup
+      subnet: alm-{{ customer_name }}-subnetgroup
       vpc_security_groups: "{{ database_sg_id }}"
       region: "{{ region }}"
       publicly_accessible: no
-      instance_name: jira-rds-{{ customer_name }}-nva
+      instance_name: jira-{{ customer_name }}-nva
       db_engine: postgres
       engine_version: 9.6.11
       size: 10
@@ -23,13 +23,13 @@
       username: jiratest01
       password: jiratest01
       tags:
-        Environment: alm-{{ customer_name }}-rds-creation
+        Environment: alm-{{ customer_name }}-creation
         Application: Atlassian
 
   - name: Create CONF rds instance
     rds:
       command: create
-      subnet: alm-{{ customer_name }}-rds-subnetgroup
+      subnet: alm-{{ customer_name }}-subnetgroup
       vpc_security_groups: "{{ database_sg_id }}"
       region: "{{ region }}"
       publicly_accessible: no
@@ -42,5 +42,5 @@
       username: conftest01
       password: conftest01
       tags:
-        Environment: alm-{{ customer_name }}-rds-creation
+        Environment: alm-{{ customer_name }}-creation
         Application: Atlassian

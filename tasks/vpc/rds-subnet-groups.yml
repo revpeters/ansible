@@ -11,7 +11,7 @@
     rds_subnet_group:
       region: "{{ region }}"
       state: present
-      name: alm-{{ customer_name }}-rds-subnetgroup
+      name: alm-{{ customer_name }}-subnetgroup
       description: Subnet Group for {{ customer_name }} RDS instance
       subnets:
         - "{{ db_subnet_1_id }}"

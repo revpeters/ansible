@@ -4,4 +4,4 @@
 - import_playbook: tasks/create-atlasian-user.yml
 - import_playbook: tasks/install-jira-opt.yml
 - import_playbook: tasks/install-conf-opt.yml
-- import_playbook: tasks/create-postgres-user.yml
+#- import_playbook: tasks/create-postgres-user.yml

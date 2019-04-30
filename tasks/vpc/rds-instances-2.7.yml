@@ -7,44 +7,36 @@
   vars_files:
     - ../../vars/control.yml
   tasks:
-  - name: Create RDS postgreSQL instance
+  - name: Create RDS instance
     rds_instance:
-      command: create
-      db_subnet_group_name: alm-{{ customer_name }}-rds-subnetgroup
-      vpc_security_group_ids: "{{ database_sg_id }}"
+      id: jira-{{ customer_name }}-nva
+      state: present
       region: "{{ region }}"
-      publicly_accessible: no
-      db_instance_identifier: jira-rds-{{ customer_name }}-nva
+      vpc_security_group_ids: "{{ database_sg_id }}"
+      subnet_group: alm-{{ customer_name }}-subnetgroup
       engine: postgres
       engine_version: 9.6.11
-      allocated_storage: 20
       storage_encrypted: True
-      storage_type: gp2
-      instance_type: db.t2.micro
+      db_instance_class: db.t2.medium
       db_name: jiratest01
       username: jiratest01
       password: jiratest01
-      tags:
-        Environment: alm-{{ customer_name }}-rds-creation
-        Application: Atlassian
-
-  - name: Create CONF rds instance
-    rds_instance:
-      state: present
-      db_subnet_group_name: alm-{{ customer_name }}-rds-subnetgroup
-      vpc_security_group_ids: "{{ database_sg_id }}"
-      region: "{{ region }}"
-      publicly_accessible: no
-      db_instance_identifier: conf-rds-{{ customer_name }}-nva
-      engine: postgres
-      engine_version: 9.6.11
       allocated_storage: 20
-      storage_encrypted: True
-      storage_type: gp2
-      instance_type: db.t2.micro
-      db_name: conftest01
-      username: conftest01
-      password: conftest01
-      tags:
-        Environment: alm-{{ customer_name }}-rds-creation
-        Application: Atlassian
+      publicly_accessible: no
+
+#  - name: Create RDS instance
+#    rds_instance:
+#      id: conf-{{ customer_name }}-nva
+#      state: present
+#      region: "{{ region }}"
+#      vpc_security_group_ids: "{{ database_sg_id }}"
+#      subnet_group: alm-{{ customer_name }}-subnetgroup
+#      engine: postgres
+#      engine_version: 9.6.11
+#      storage_encrypted: True
+#      db_instance_class: db.t2.medium
+#      db_name: conftest01
+#      username: conftest01
+#      password: conftest01
+#      allocated_storage: 20
+#      publicly_accessible: no

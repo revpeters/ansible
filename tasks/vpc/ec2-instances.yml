@@ -40,9 +40,9 @@
   - name: Create Bastion EC2 instance
     ec2:
       region: "{{ region }}"
-      key_name: "{{ ec2_key }}"
+      key_name: "{{ jump_ec2_key }}"
       image: "{{ jump_image }}"
-      instance_type: "{{ instance_type }}"
+      instance_type: t2.micro
       group_id: "{{ jump_sg_id }}"
       vpc_subnet_id: "{{ public_subnet_id }}"
       assign_public_ip: yes

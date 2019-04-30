@@ -37,7 +37,7 @@
       vpc_id: "{{ vpc_id }}"
       region: "{{ region }}"
       cidr: 10.0.2.0/24
-      az: us-east-1f
+      az: us-east-1e
     register: db_subnet_1
 
   - name: Create DB Subnet
@@ -48,7 +48,7 @@
       vpc_id: "{{ vpc_id }}"
       region: "{{ region }}"
       cidr: 10.0.3.0/24
-      az: us-east-1e
+      az: us-east-1f
     register: db_subnet_2
 
   - name: Set Public Subnet ID in var
