@@ -3,7 +3,6 @@
   connection: ssh
   remote_user: ec2-user
   become: yes
-  gather_facts: yes
   vars_files:
     - ../vars/control.yml
   tasks:
@@ -17,3 +16,14 @@
         name: "{{ atlassian_user }}"
         group: "{{ atlassian_group }}"
         shell: /bin/bash
+
+    - name: Copy iptables settings to instance
+      copy:
+        src: ../files/iptables.dump
+        dest: /etc/sysconfig/iptables
+        owner: root
+        group: root
+        mode: 0600
+
+    - name: Configure iptables from file
+      shell: iptables-restore < /etc/sysconfig/iptables

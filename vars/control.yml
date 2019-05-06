@@ -5,17 +5,24 @@ customer_name: pocrds
 #environment: dev # prod non-prod dr dev
 region: us-east-1
 r53_zone:
-  jira: engit-alm.com
-  conf: engit-alm.com
+  jira: engit-alm.com/jira
+  conf: engit-alm.com/conf
 
-app_image: ami-0a865eb1e9423a1c4
-jump_image: ami-0a865eb1e9423a1c4
-db_image: ami-0a865eb1e9423a1c4
+app_image: ami-011b3ccf1bd6db744
+jump_image: ami-011b3ccf1bd6db744
+db_image: ami-011b3ccf1bd6db744
 
-instance_type: m4.xlarge
+#app_image: ami-0a865eb1e9423a1c4
+#jump_image: ami-0a865eb1e9423a1c4
+#db_image: ami-0a865eb1e9423a1c4
 
-jump_ec2_key: bastion
-ec2_key: jira-datacenter
+instance_type: t2.micro
+
+jump_ec2_key: LA-us-east-1
+ec2_key: LA-us-east-1
+
+#jump_ec2_key: bastion
+#ec2_key: jira-datacenter
 
 ssh_config_path: /home/jacopete/.ssh/config
 
