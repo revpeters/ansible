@@ -18,9 +18,6 @@
       assign_public_ip: yes
       private_ip: 10.0.1.34
       wait: yes
-      volume:
-        - device_name: /dev/sdb
-          volume_size: "{{ jira_ec2_size }}"
       instance_tags:
         Name: jira.{{ customer_name }}.nva
     register: jira

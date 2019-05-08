@@ -1,4 +1,21 @@
 ---
+- hosts: localhost
+  connection: local
+  vars_prompt:
+    - name: "customer_name"
+      prompt: "What ID are we using for the customer?"
+      default: "pocrds"
+      private: no
+    - name: "region"
+      prompt: "What region are we deploying them in?"
+      default: "us-east-1"
+      private: no
+  tasks:
+  - set_fact:
+      customer_name: "{{ customer_name  }}"
+  - set_fact:
+      region: "{{ region }}"
+
 - import_playbook: tasks/create-vpc.yml
 - import_playbook: tasks/bastion-config.yml
 - import_playbook: tasks/configure-atlassian-instance.yml

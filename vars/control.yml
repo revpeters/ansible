@@ -1,12 +1,15 @@
 --- # Variable for AWS Customers
 #AWS_SECRET_ACCESS_KEY: ......  store in vault
 #AWS_ACCESS_KEY_ID: ....... store in vault
-customer_name: pocrds
+#customer_name: pocrds
 #environment: dev # prod non-prod dr dev
-region: us-east-1
-r53_zone:
-  jira: engit-alm.com/jira
-  conf: engit-alm.com/conf
+#region: us-east-1
+
+app:
+  jira: jira
+  conf: conf
+
+r53_zone: engit-alm.com
 
 app_image: ami-011b3ccf1bd6db744
 jump_image: ami-011b3ccf1bd6db744

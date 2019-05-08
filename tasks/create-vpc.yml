@@ -5,7 +5,7 @@
 - import_playbook: vpc/route-tables.yml
 - import_playbook: vpc/nacl.yml
 - import_playbook: vpc/security-groups.yml
-- import_playbook: vpc/rds-instances-2.7.yml
+#- import_playbook: vpc/rds-instances-2.7.yml
 - import_playbook: vpc/ec2-instances.yml
 #- import_playbook: vpc/db-ec2-instances.yml
 #- import_playbook: vpc/route-53.yml

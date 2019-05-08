@@ -7,6 +7,10 @@
   vars_files:
     - ../vars/control.yml
   tasks:
+    - name: Set vars from localhost
+      set_fact:
+        customer_name: "{{hostvars['localhost']['customer_name']}}"
+
     - name: Install HTTPD
       yum:
         name: "{{ item }}"
@@ -77,11 +81,23 @@
         insertbefore: 'export PATH'
         line: 'export JAVA_HOME={{ java_home }}'
 
-    - name: update setenv.sh with JIRA_HOME
-      lineinfile:
-        path: "{{ jira_install_dir }}/current/bin/setenv.sh"
-        regexp: '^#JIRA_HOME='
-        line: 'JIRA_HOME="{{ jira_home }}"'
+    - name: Update server.xml, stenv.sh
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: "{{ atlassian_user }}"
+        group: "{{ atlassian_group }}"
+      with_items:
+        - { src: "../files/jira/server.xml", dest: "{{ jira_install_dir }}/current/conf/" }
+        - { src: "../files/jira/setenv.sh", dest: "{{ jira_install_dir }}/current/bin/" }
+
+    - name: Update httpd.conf with domain names
+      template:
+        src: /etc/ansible/playbooks/templates/httpd.conf.j2
+        dest: /etc/httpd/conf/httpd.conf
+        owner: "{{ atlassian_user }}"
+        group: "{{ atlassian_group }}"
+      become: true
 
     - name: Start HTTPD
       service:

@@ -7,13 +7,13 @@ Listen 443
 
 #
 <VirtualHost *:80>
-     ServerName           pocrds-jira.engit-alm.com
-     Redirect   /         https://pocrds-jira.engit-alm.com/
+     ServerName           {{ customer_name }}-{{ app.jira }}.{{ r53_zone }}
+     Redirect   /         https://{{ customer_name }}-{{ app.jira }}.{{ r53_zone }}/
 </VirtualHost>
 
 <VirtualHost *:443>
-    ServerName                  pocrds-jira.engit-alm.com
-    Redirect   /                https://pocrds-jira.engit-alm.com/jira
+    ServerName                  {{ customer_name }}-{{ app.jira }}.{{ r53_zone }}
+    Redirect   /                https://{{ customer_name }}-{{ app.jira }}.{{ r53_zone }}/jira
     RemoteIPHeader              X-Forwarded-For
     ProxyRequests               Off
 #    SSLProxyEngine              On
@@ -22,9 +22,9 @@ Listen 443
 #    SSLProxyCheckPeerName       Off
 #    SSLProxyVerify              None
 #    SSLProxyCheckPeerExpire     Off
-#    SSLCertificateFile          /etc/letsencrypt/live/pocrds-jira.engit-alm.com/cert.pem
-#    SSLCertificateKeyFile       /etc/letsencrypt/live/pocrds-jira.engit-alm.com/privkey.pem
-#    SSLCertificateChainFile     /etc/letsencrypt/live/pocrds-jira.engit-alm.com/chain.pem
+#    SSLCertificateFile          /etc/letsencrypt/live/{{ customer_name }}-{{ app.jira }}.{{ r53_zone }}/cert.pem
+#    SSLCertificateKeyFile       /etc/letsencrypt/live/{{ customer_name }}-{{ app.jira }}.{{ r53_zone }}/privkey.pem
+#    SSLCertificateChainFile     /etc/letsencrypt/live/{{ customer_name }}-{{ app.jira }}.{{ r53_zone }}/chain.pem
 #    ErrorLog                    logs/ssl_error_log
 #    TransferLog                 logs/ssl_access_log
     LogLevel                    warn
@@ -33,8 +33,8 @@ Listen 443
          Require all granted
     </Proxy>
 
-    ProxyPass /jira https://pocrds-jira.engit-alm.com:8443/jira
-    ProxyPassReverse /jira https://pocrds-jira.engit-alm.com:8443/jira
+    ProxyPass /jira https://{{ customer_name }}-{{ app.jira }}.{{ r53_zone }}:8443/jira
+    ProxyPassReverse /jira https://{{ customer_name }}-{{ app.jira }}.{{ r53_zone }}:8443/jira
 
     <Location /jira>
          Require all granted

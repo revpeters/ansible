@@ -10,7 +10,7 @@
   - name: Update ssh config
     blockinfile:
       path: "{{ ssh_config_path }}"
-      block: |
+      content: |
         Host *.{{ customer_name }}.nva
             ForwardAgent yes
             User ec2-user
