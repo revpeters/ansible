@@ -101,7 +101,7 @@
       with_items:
         - { src: "/etc/ansible/playbooks/templates/server.xml.j2", dest: "{{ jira_install_dir }}/current/conf/server.xml" }
         - { src: "/etc/ansible/playbooks/templates/httpd.conf.j2", dest: "/etc/httpd/conf/httpd.conf" }
-        - { src: "/etc/ansible/playbooks/templates/renewcerts.sh.j2", dest: "{{ jira_home }}/scripts/renewcerts.sh"}
+        - { src: "/etc/ansible/playbooks/templates/renewcerts.sh.j2", dest: "{{ jira_home }}/renewcerts.sh"}
       become: true
 
     - name: Start HTTPD
