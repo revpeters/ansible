@@ -9,7 +9,12 @@
   tasks:
   - name: Set vars from localhost
     set_fact:
-      customer_name: "{{hostvars['localhost']['customer_name']}}"
+      customer_name: "{{ hostvars['localhost']['customer_name'] }}"
+
+  - name: Set vars from localhost
+    set_fact:
+      tld: "{{ hostvars['localhost']['tld'] }}"
+
   - name: Wait for SSH on jumphost
     wait_for_connection:
       timeout: 120

@@ -9,7 +9,7 @@
   tasks:
   - name: Create RDS instance
     rds_instance:
-      id: jira-{{ customer_name }}-nva
+      id: jira-{{ customer_name }}-{{ tld }}
       state: present
       region: "{{ region }}"
       vpc_security_group_ids: "{{ database_sg_id }}"

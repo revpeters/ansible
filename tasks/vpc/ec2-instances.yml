@@ -19,7 +19,7 @@
       private_ip: 10.0.1.34
       wait: yes
       instance_tags:
-        Name: jira.{{ customer_name }}.nva
+        Name: jira.{{ customer_name }}.{{ tld }}
     register: jira
 
   - name: Create CONFLUENCE EC2 instance
@@ -34,7 +34,7 @@
       private_ip: 10.0.1.64
       wait: yes
       instance_tags:
-        Name: conf.{{ customer_name }}.nva
+        Name: conf.{{ customer_name }}.{{ tld }}
     register: conf
 
   - name: Create Bastion EC2 instance
@@ -48,7 +48,7 @@
       assign_public_ip: yes
       private_ip: 10.0.0.132
       instance_tags:
-        Name: jump.{{ customer_name }}.nva
+        Name: jump.{{ customer_name }}.{{ tld }}
       wait: yes
     register: bastion
 
@@ -74,12 +74,12 @@
 
   - name: Add conf to host group
     add_host:
-      hostname: conf.{{ customer_name }}.nva
+      hostname: conf.{{ customer_name }}.{{ tld }}
       groupname: conf
       ansible_ssh_common_args: -o ProxyCommand="ssh ec2-user@{{ jump_ip }} nc %h %p -w 10"
 
   - name: Add jira to host group
     add_host:
-      hostname: jira.{{ customer_name }}.nva
+      hostname: jira.{{ customer_name }}.{{ tld }}
       groupname: jira
       ansible_ssh_common_args: -o ProxyCommand="ssh ec2-user@{{ jump_ip }} nc %h %p -w 10"

@@ -4,18 +4,14 @@
   remote_user: ec2-user
   become: yes
   gather_facts: yes
+  vars:
+    app: jira
   vars_files:
     - ../vars/control.yml
   tasks:
     - name: Set vars from localhost
       set_fact:
         customer_name: "{{hostvars['localhost']['customer_name']}}"
-
-    - name: Install HTTPD
-      yum:
-        name: "{{ item }}"
-      with_items:
-        - httpd
 
     - name: Create jira, jira-home, java
       file:
@@ -81,28 +77,37 @@
         insertbefore: 'export PATH'
         line: 'export JAVA_HOME={{ java_home }}'
 
-    - name: Update server.xml, stenv.sh
+    - name: Update PATH
+      lineinfile:
+        path: "/home/{{ atlassian_user }}/.bash_profile"
+        regex: '^export PATH'
+        line: 'export PATH=$PATH:$JAVA_HOME/jre/bin'
+
+    - name: Update setenv.sh
       copy:
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"
         owner: "{{ atlassian_user }}"
         group: "{{ atlassian_group }}"
       with_items:
-        - { src: "../files/jira/server.xml", dest: "{{ jira_install_dir }}/current/conf/" }
         - { src: "../files/jira/setenv.sh", dest: "{{ jira_install_dir }}/current/bin/" }
 
-    - name: Update httpd.conf with domain names
+    - name: Update httpd.conf and server.xml with domain names
       template:
-        src: /etc/ansible/playbooks/templates/httpd.conf.j2
-        dest: /etc/httpd/conf/httpd.conf
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
         owner: "{{ atlassian_user }}"
         group: "{{ atlassian_group }}"
+      with_items:
+        - { src: "/etc/ansible/playbooks/templates/server.xml.j2", dest: "{{ jira_install_dir }}/current/conf/server.xml" }
+        - { src: "/etc/ansible/playbooks/templates/httpd.conf.j2", dest: "/etc/httpd/conf/httpd.conf" }
+        - { src: "/etc/ansible/playbooks/templates/renewcerts.sh.j2", dest: "{{ jira_home }}/scripts/renewcerts.sh"}
       become: true
 
     - name: Start HTTPD
       service:
         name: httpd
-        state: started
+        state: restarted
 
     - name: Start JIRA
       command: su - atlasian -c "{{ jira_install_dir }}/current/bin/start-jira.sh"

@@ -8,6 +8,6 @@
 #- import_playbook: vpc/rds-instances-2.7.yml
 - import_playbook: vpc/ec2-instances.yml
 #- import_playbook: vpc/db-ec2-instances.yml
-#- import_playbook: vpc/route-53.yml
+- import_playbook: vpc/route-53.yml
 - import_playbook: vpc/ssh-config.yml
 #- import_playbook: vpc/nagios-cfg.yml

@@ -15,6 +15,9 @@
       customer_name: "{{ customer_name  }}"
   - set_fact:
       region: "{{ region }}"
+  - set_fact:
+      tld: nva
+      when: region == "us-east-1"
 
 - import_playbook: tasks/create-vpc.yml
 - import_playbook: tasks/bastion-config.yml

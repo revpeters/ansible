@@ -1,0 +1,31 @@
+#!/bin/sh
+
+#Change the below variables to match server
+hostname="{{ customer_name }}-{{ app }}.{{ r53_zone }}"
+projectkey="{{ customer_name }}"
+appkey="{{ app }}"
+
+#log our output
+exec &> /data/atlassian/${appkey}-home/renewcertslog.txt
+
+#Import new certs into cacerts file
+keytool -delete -storepass changeit -alias ${projectkey}-${appkey}-chain -keystore /data/tools/java/current/jre/lib/security/cacerts
+keytool -delete -storepass changeit -alias ${projectkey}-${appkey}-cert -keystore /data/tools/java/current/jre/lib/security/cacerts
+cd /etc/letsencrypt/live/${hostname}/
+keytool -import -storepass changeit -noprompt -alias ${projectkey}-${appkey}-chain -keystore /data/tools/java/current/jre/lib/security/cacerts -file chain.pem
+keytool -import -storepass changeit -noprompt -alias ${projectkey}-${appkey}-cert -keystore /data/tools/java/current/jre/lib/security/cacerts -file cert.pem
+
+#Build new JKS file for tomcat
+rm -rf fullchain_and_key.p12
+openssl pkcs12 -export -in fullchain.pem -inkey privkey.pem -password pass:changeit -out fullchain_and_key.p12 -name ${projectkey}-${appkey}
+rm -rf ${appkey}.jks
+keytool -importkeystore -deststorepass changeit -destkeypass changeit -destkeystore ${appkey}.jks -srckeystore fullchain_and_key.p12 -srcstoretype PKCS12 -srcstorepass changeit -alias ${projectkey}-${appkey}
+rm -rf /data/atlassian/${appkey}-home/${appkey}.jks
+cp ${appkey}.jks /data/atlassian/${appkey}-home/
+cd /data/atlassian/${appkey}-home/
+chown atlasian:atlasian ${appkey}.jks
+
+#Stop / Start app
+cd /data/atlassian/${appkey}/current/bin
+./stop-${appkey}.sh
+./start-${appkey}.sh

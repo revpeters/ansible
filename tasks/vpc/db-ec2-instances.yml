@@ -19,7 +19,7 @@
       private_ip: 10.0.2.13
       wait: yes
       instance_tags:
-        Name: pgpool.{{ customer_name }}.nva
+        Name: pgpool.{{ customer_name }}.{{ tld }}
     register: pgpool
 
   - name: Create Pgres1 EC2 instance
@@ -34,7 +34,7 @@
       private_ip: 10.0.2.11
       wait: yes
       instance_tags:
-        Name: pgres1.{{ customer_name }}.nva
+        Name: pgres1.{{ customer_name }}.{{ tld }}
     register: pgres1
 
   - name: Create Pgres2 EC2 instance
@@ -48,7 +48,7 @@
       assign_public_ip: no
       private_ip: 10.0.2.12
       instance_tags:
-        Name: pgres2.{{ customer_name }}.nva
+        Name: pgres2.{{ customer_name }}.{{ tld }}
       wait: yes
     register: pgres2
 
@@ -69,18 +69,18 @@
 
   - name: Add pgpool to host group
     add_host:
-      hostname: pgpool.{{ customer_name }}.nva
+      hostname: pgpool.{{ customer_name }}.{{ tld }}
       groupname: pgres
       ansible_ssh_common_args: -o ProxyCommand="ssh ec2-user@{{ jump_ip }} nc %h %p -w 10"
 
   - name: Add pgres1 to host group
     add_host:
-      hostname: pgres1.{{ customer_name }}.nva
+      hostname: pgres1.{{ customer_name }}.{{ tld }}
       groupname: pgres
       ansible_ssh_common_args: -o ProxyCommand="ssh ec2-user@{{ jump_ip }} nc %h %p -w 10"
 
   - name: Add pgres2 to host group
     add_host:
-      hostname: pgres2.{{ customer_name }}.nva
+      hostname: pgres2.{{ customer_name }}.{{ tld }}
       groupname: pgres
       ansible_ssh_common_args: -o ProxyCommand="ssh ec2-user@{{ jump_ip }} nc %h %p -w 10"

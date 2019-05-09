@@ -3,38 +3,38 @@ ServerRoot "/etc/httpd"
 
 #
 Listen 80
-Listen 443
+#Listen 443
 
 #
 <VirtualHost *:80>
-     ServerName           {{ customer_name }}-{{ app.jira }}.{{ r53_zone }}
-     Redirect   /         https://{{ customer_name }}-{{ app.jira }}.{{ r53_zone }}/
+     ServerName           {{ customer_name }}-{{ app }}.{{ r53_zone }}
+     Redirect   /         http://{{ customer_name }}-{{ app }}.{{ r53_zone }}/jira
 </VirtualHost>
 
 <VirtualHost *:443>
-    ServerName                  {{ customer_name }}-{{ app.jira }}.{{ r53_zone }}
-    Redirect   /                https://{{ customer_name }}-{{ app.jira }}.{{ r53_zone }}/jira
+    ServerName                  {{ customer_name }}-{{ app }}.{{ r53_zone }}
+    Redirect   /                https://{{ customer_name }}-{{ app }}.{{ r53_zone }}/jira
     RemoteIPHeader              X-Forwarded-For
     ProxyRequests               Off
-#    SSLProxyEngine              On
-#    SSLEngine                   On
-#    SSLProxyCheckPeerCN         Off
-#    SSLProxyCheckPeerName       Off
-#    SSLProxyVerify              None
-#    SSLProxyCheckPeerExpire     Off
-#    SSLCertificateFile          /etc/letsencrypt/live/{{ customer_name }}-{{ app.jira }}.{{ r53_zone }}/cert.pem
-#    SSLCertificateKeyFile       /etc/letsencrypt/live/{{ customer_name }}-{{ app.jira }}.{{ r53_zone }}/privkey.pem
-#    SSLCertificateChainFile     /etc/letsencrypt/live/{{ customer_name }}-{{ app.jira }}.{{ r53_zone }}/chain.pem
-#    ErrorLog                    logs/ssl_error_log
-#    TransferLog                 logs/ssl_access_log
+    SSLProxyEngine              On
+    SSLEngine                   On
+    SSLProxyCheckPeerCN         Off
+    SSLProxyCheckPeerName       Off
+    SSLProxyVerify              None
+    SSLProxyCheckPeerExpire     Off
+    SSLCertificateFile          /etc/letsencrypt/live/{{ customer_name }}-{{ app }}.{{ r53_zone }}/cert.pem
+    SSLCertificateKeyFile       /etc/letsencrypt/live/{{ customer_name }}-{{ app }}.{{ r53_zone }}/privkey.pem
+    SSLCertificateChainFile     /etc/letsencrypt/live/{{ customer_name }}-{{ app }}.{{ r53_zone }}/chain.pem
+    ErrorLog                    logs/ssl_error_log
+    TransferLog                 logs/ssl_access_log
     LogLevel                    warn
 
     <Proxy *>
          Require all granted
     </Proxy>
 
-    ProxyPass /jira https://{{ customer_name }}-{{ app.jira }}.{{ r53_zone }}:8443/jira
-    ProxyPassReverse /jira https://{{ customer_name }}-{{ app.jira }}.{{ r53_zone }}:8443/jira
+    ProxyPass /jira https://{{ customer_name }}-{{ app }}.{{ r53_zone }}:8443/jira
+    ProxyPassReverse /jira https://{{ customer_name }}-{{ app }}.{{ r53_zone }}:8443/jira
 
     <Location /jira>
          Require all granted
@@ -140,8 +140,8 @@ IncludeOptional conf.d/*.conf
 ServerSignature Off
 ServerTokens Prod
 
-#SSLProtocol -SSLv2 -SSLv3 -TLSv1 -TLSv1.1 +TLSv1.2
-#SSLProxyProtocol -SSLv2 -SSLv3 -TLSv1 -TLSv1.1 +TLSv1.2
+SSLProtocol -SSLv2 -SSLv3 -TLSv1 -TLSv1.1 +TLSv1.2
+SSLProxyProtocol -SSLv2 -SSLv3 -TLSv1 -TLSv1.1 +TLSv1.2
 
-#SSLHonorCipherOrder On
-#SSLCipherSuite ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA::DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA:!3DES
+SSLHonorCipherOrder On
+SSLCipherSuite ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA::DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA:!3DES

@@ -4,14 +4,14 @@
   remote_user: ec2-user
   become: yes
   gather_facts: yes
+  vars:
+    app: conf
   vars_files:
     - ../vars/control.yml
   tasks:
-    - name: Install HTTPD
-      yum:
-        name: "{{ item }}"
-      with_items:
-        - httpd
+    - name: Set vars from localhost
+      set_fact:
+        customer_name: "{{hostvars['localhost']['customer_name']}}"
 
     - name: Create confluence, confluence-home, java
       file:
@@ -68,6 +68,26 @@
         path: /data/atlassian/confluence/current/confluence/WEB-INF/classes/confluence-init.properties
         regexp: '^# confluence.home='
         line: 'confluence.home="/data/atlassian/confluence-home"'
+
+    - name: Update setenv.sh
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: "{{ atlassian_user }}"
+        group: "{{ atlassian_group }}"
+      with_items:
+        - { src: "../files/confluence/setenv.sh", dest: "{{ confluence_install_dir }}/current/bin/" }
+
+    - name: Update httpd.conf and server.xml with domain names
+      template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: "{{ atlassian_user }}"
+        group: "{{ atlassian_group }}"
+      with_items:
+        - { src: "/etc/ansible/playbooks/templates/server.xml.j2", dest: "{{ confluence_install_dir }}/current/conf/server.xml" }
+        - { src: "/etc/ansible/playbooks/templates/httpd.conf.j2", dest: "/etc/httpd/conf/httpd.conf" }
+      become: true
 
     - name: Start HTTPD
       service:

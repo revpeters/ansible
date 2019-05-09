@@ -5,11 +5,12 @@
 #environment: dev # prod non-prod dr dev
 #region: us-east-1
 
-app:
-  jira: jira
-  conf: conf
+#app:
+#  jira: jira
+#  conf: conf
 
-r53_zone: engit-alm.com
+#r53_zone: engit-alm.com
+r53_zone: moatsneedboats.com
 
 app_image: ami-011b3ccf1bd6db744
 jump_image: ami-011b3ccf1bd6db744
@@ -19,7 +20,7 @@ db_image: ami-011b3ccf1bd6db744
 #jump_image: ami-0a865eb1e9423a1c4
 #db_image: ami-0a865eb1e9423a1c4
 
-instance_type: t2.micro
+instance_type: t2.medium
 
 jump_ec2_key: LA-us-east-1
 ec2_key: LA-us-east-1

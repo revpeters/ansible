@@ -27,3 +27,34 @@
 
     - name: Configure iptables from file
       shell: iptables-restore < /etc/sysconfig/iptables
+
+    - name: Add EPEL repository
+      yum:
+        name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+
+    - name: Enable rhui-REGION-rhel-server-extras and rhui-REGION-rhel-server-optional
+      ini_file:
+        dest: /etc/yum.repos.d/redhat-rhui.repo
+        section: "{{ item }}"
+        option: enabled
+        value: 1
+      with_items:
+        - rhui-REGION-rhel-server-extras
+        - rhui-REGION-rhel-server-optional
+
+    - name: Install HTTPD, yum-utils, certbot-apache
+      yum:
+        name: ['httpd', 'yum-utils', 'certbot-apache']
+
+    - name: Set permission on httpd
+      file:
+        path: /etc/httpd
+        state: directory
+        owner: "{{ atlassian_user }}"
+        group: "{{ atlassian_group }}"
+        recurse: yes
+
+    - name: Enable HTTPD
+      service:
+        name: httpd
+        enabled: yes
