@@ -11,43 +11,6 @@ Listen 443
      Redirect   /         http://{{ customer_name }}-{{ app }}.{{ r53_zone }}/
 </VirtualHost>
 
-<VirtualHost *:443>
-    ServerName                  {{ customer_name }}-{{ app }}.{{ r53_zone }}
-    Redirect   /                https://{{ customer_name }}-{{ app }}.{{ r53_zone }}/jira
-    RemoteIPHeader              X-Forwarded-For
-    ProxyRequests               Off
-    SSLProxyEngine              On
-    SSLEngine                   On
-    SSLProxyCheckPeerCN         Off
-    SSLProxyCheckPeerName       Off
-    SSLProxyVerify              None
-    SSLProxyCheckPeerExpire     Off
-    SSLCertificateFile          /etc/letsencrypt/live/{{ customer_name }}-{{ app }}.{{ r53_zone }}/cert.pem
-    SSLCertificateKeyFile       /etc/letsencrypt/live/{{ customer_name }}-{{ app }}.{{ r53_zone }}/privkey.pem
-    SSLCertificateChainFile     /etc/letsencrypt/live/{{ customer_name }}-{{ app }}.{{ r53_zone }}/chain.pem
-    ErrorLog                    logs/ssl_error_log
-    TransferLog                 logs/ssl_access_log
-    LogLevel                    warn
-
-    <Proxy *>
-         Require all granted
-    </Proxy>
-
-    ProxyPass /jira https://{{ customer_name }}-{{ app }}.{{ r53_zone }}:8443/jira
-    ProxyPassReverse /jira https://{{ customer_name }}-{{ app }}.{{ r53_zone }}:8443/jira
-
-    <Location /jira>
-         Require all granted
-    </Location>
-
-    #<IfModule mod_headers.c>
-        Header always set X-Frame-Options SAMEORIGIN
-        Header always set X-XSS-Protection "1; mode=block"
-        Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
-    #</IfModule>
-
-</VirtualHost>
-
 #
 Include conf.modules.d/*.conf
 

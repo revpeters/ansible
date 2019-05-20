@@ -8,12 +8,12 @@ Listen 443
 #
 <VirtualHost *:80>
      ServerName           {{ customer_name }}-{{ app }}.{{ r53_zone }}
-     Redirect   /         http://{{ customer_name }}-{{ app }}.{{ r53_zone }}/
+     Redirect   /         https://{{ customer_name }}-{{ app }}.{{ r53_zone }}/
 </VirtualHost>
 
 <VirtualHost *:443>
     ServerName                  {{ customer_name }}-{{ app }}.{{ r53_zone }}
-    Redirect   /                https://{{ customer_name }}-{{ app }}.{{ r53_zone }}/jira
+    Redirect   /                https://{{ customer_name }}-{{ app }}.{{ r53_zone }}/conf
     RemoteIPHeader              X-Forwarded-For
     ProxyRequests               Off
     SSLProxyEngine              On
@@ -22,7 +22,7 @@ Listen 443
     SSLProxyCheckPeerName       Off
     SSLProxyVerify              None
     SSLProxyCheckPeerExpire     Off
-    SSLCertificateFile          /etc/letsencrypt/live/{{ customer_name }}-{{ app }}.{{ r53_zone }}/cert.pem
+    SSLCertificateFile          /etc/letsencrypt/live/{{ customer_name }}-{{ app }}.{{ r53_zone }}/fullchain.pem
     SSLCertificateKeyFile       /etc/letsencrypt/live/{{ customer_name }}-{{ app }}.{{ r53_zone }}/privkey.pem
     SSLCertificateChainFile     /etc/letsencrypt/live/{{ customer_name }}-{{ app }}.{{ r53_zone }}/chain.pem
     ErrorLog                    logs/ssl_error_log
@@ -33,10 +33,10 @@ Listen 443
          Require all granted
     </Proxy>
 
-    ProxyPass /jira https://{{ customer_name }}-{{ app }}.{{ r53_zone }}:8443/jira
-    ProxyPassReverse /jira https://{{ customer_name }}-{{ app }}.{{ r53_zone }}:8443/jira
+    ProxyPass /conf https://{{ customer_name }}-{{ app }}.{{ r53_zone }}:8443/conf
+    ProxyPassReverse /conf https://{{ customer_name }}-{{ app }}.{{ r53_zone }}:8443/conf
 
-    <Location /jira>
+    <Location /conf>
          Require all granted
     </Location>
 

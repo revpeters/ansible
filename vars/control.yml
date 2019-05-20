@@ -9,26 +9,21 @@
 #  jira: jira
 #  conf: conf
 
-#r53_zone: engit-alm.com
-r53_zone: moatsneedboats.com
+r53_zone: engit-alm.com
 
-app_image: ami-011b3ccf1bd6db744
-jump_image: ami-011b3ccf1bd6db744
-db_image: ami-011b3ccf1bd6db744
+app_image: ami-0a865eb1e9423a1c4
+jump_image: ami-0a865eb1e9423a1c4
+db_image: ami-0246bb659d1d9b49a
 
-#app_image: ami-0a865eb1e9423a1c4
-#jump_image: ami-0a865eb1e9423a1c4
-#db_image: ami-0a865eb1e9423a1c4
+instance_type: m4.xlarge
 
-instance_type: t2.medium
+#jump_ec2_key: LA-us-east-1
+#ec2_key: LA-us-east-1
 
-jump_ec2_key: LA-us-east-1
-ec2_key: LA-us-east-1
+jump_ec2_key: bastion
+ec2_key: jira-datacenter
 
-#jump_ec2_key: bastion
-#ec2_key: jira-datacenter
-
-ssh_config_path: /home/jacopete/.ssh/config
+ssh_config_path: ~/.ssh/config
 
 atlassian_user: atlasian
 atlassian_group: atlasian
@@ -45,13 +40,15 @@ jira_version: atlassian-jira-software-7.13.1
 jira_install_dir: /data/atlassian/jira
 jira_home: /data/atlassian/jira-home
 jira_download_url: https://www.atlassian.com/software/jira/downloads/binary/atlassian-jira-software-7.13.1.tar.gz
-jira_ec2_size: 300
+jira_ec2_size: 160
 
 confluence_version: atlassian-confluence-6.14.3
 confluence_install_dir: /data/atlassian/confluence
 confluence_home: /data/atlassian/confluence-home
 confluence_download_url: https://www.atlassian.com/software/confluence/downloads/binary/atlassian-confluence-6.14.3.tar.gz
-confluence_ec2_size: 300
+confluence_ec2_size: 200
+
+postgres_ec2_size: 110
 
 postgres_driver: postgresql-42.1.1.jar
 rds_engine: postgres

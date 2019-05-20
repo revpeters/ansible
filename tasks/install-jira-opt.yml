@@ -6,6 +6,7 @@
   gather_facts: yes
   vars:
     app: jira
+    appkey: jira
   vars_files:
     - ../vars/control.yml
   tasks:
@@ -58,10 +59,13 @@
         - { src: "{{ jira_install_dir }}/{{ jira_version }}-standalone", dest: "{{ jira_install_dir }}/current" }
         - { src: "{{ java_install_dir }}/{{ java_version }}", dest: "{{ java_install_dir }}/current" }
 
-    - name: Remove 9.4.1212 pgres driver
+    - name: Remove 9.4.1212 pgres driver and ssl.conf
       file:
-        path: "{{ jira_install_dir }}/current/lib/postgresql-9.4.1212.jar"
+        path: "{{ item }}"
         state: absent
+      with_items:
+        - "/etc/httpd/conf.d/ssl.conf"
+        - "{{ jira_install_dir }}/current/lib/postgresql-9.4.1212.jar"
 
     - name: download 42.2.1 pgres driver
       get_url:
@@ -99,15 +103,53 @@
         owner: "{{ atlassian_user }}"
         group: "{{ atlassian_group }}"
       with_items:
-        - { src: "/etc/ansible/playbooks/templates/server.xml.j2", dest: "{{ jira_install_dir }}/current/conf/server.xml" }
-        - { src: "/etc/ansible/playbooks/templates/httpd.conf.j2", dest: "/etc/httpd/conf/httpd.conf" }
-        - { src: "/etc/ansible/playbooks/templates/renewcerts.sh.j2", dest: "{{ jira_home }}/renewcerts.sh"}
+        - { src: "/etc/ansible/playbooks/templates/jira/server.xml.j2", dest: "{{ jira_install_dir }}/current/conf/server.xml" }
+        - { src: "/etc/ansible/playbooks/templates/jira/httpd.conf.vhost80.j2", dest: "/etc/httpd/conf/httpd.conf" }
+        - { src: "/etc/ansible/playbooks/templates/jira/renewcerts.sh.j2", dest: "{{ jira_home }}/renewcerts.sh"}
       become: true
+
+    - name: Make renewcerts executable for atlasian
+      file:
+        path: /data/atlassian/jira-home/renewcerts.sh
+        mode: 0755
+
+    - name: Start HTTPD
+      service:
+        name: httpd
+        state: started
+
+    - name: Generate ssl certs
+      shell: "certbot --apache certonly -n -d {{ customer_name }}-{{ app }}.{{ r53_zone }} --agree-tos --email jacopete@cisco.com"
+
+    - name: Make atlasian owner of /etc/letsencrypt
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ atlassian_user }}"
+        group: "{{ atlassian_group }}"
+        recurse: yes
+      with_items:
+        - "/etc/letsencrypt"
+
+    - name: Import certs and build jks
+      shell: su - atlasian -c "/data/atlassian/jira-home/renewcerts.sh"
+
+    - name: Update httpd.conf and server.xml with domain names
+      template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: "{{ atlassian_user }}"
+        group: "{{ atlassian_group }}"
+      with_items:
+        - { src: "/etc/ansible/playbooks/templates/jira/httpd.conf.j2", dest: "/etc/httpd/conf/httpd.conf" }
 
     - name: Start HTTPD
       service:
         name: httpd
         state: restarted
 
-    - name: Start JIRA
-      command: su - atlasian -c "{{ jira_install_dir }}/current/bin/start-jira.sh"
+#    - name: Restart JIRA
+#      command: "{{ item }}"
+#      with_items:
+#        - su - atlasian -c "{{ jira_install_dir }}/current/bin/stop-jira.sh"
+#        - su - atlasian -c "{{ jira_install_dir }}/current/bin/start-jira.sh"

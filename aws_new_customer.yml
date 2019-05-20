@@ -4,11 +4,15 @@
   vars_prompt:
     - name: "customer_name"
       prompt: "What ID are we using for the customer?"
-      default: "pocrds"
+      default: "poc3"
       private: no
     - name: "region"
       prompt: "What region are we deploying them in?"
       default: "us-east-1"
+      private: no
+    - name: "tld"
+      prompt: "What top level domain are you using?"
+      default: "nva"
       private: no
   tasks:
   - set_fact:
@@ -16,8 +20,7 @@
   - set_fact:
       region: "{{ region }}"
   - set_fact:
-      tld: nva
-      when: region == "us-east-1"
+      tld: "{{ tld }}"
 
 - import_playbook: tasks/create-vpc.yml
 - import_playbook: tasks/bastion-config.yml

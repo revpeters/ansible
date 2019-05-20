@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Server port="8000" shutdown="SHUTDOWN" debug="0">
+    <Service name="Tomcat-Standalone">
+            <Connector port="8090" connectionTimeout="20000" redirectPort="8443"
+                maxThreads="48" minSpareThreads="10"
+                enableLookups="false" acceptCount="10" debug="0" URIEncoding="UTF-8"
+                protocol="org.apache.coyote.http11.Http11NioProtocol" />
+
+            <Connector port="8080"
+                acceptCount="100"
+                connectionTimeout="20000"
+                disableUploadTimeout="true"
+                enableLookups="false"
+                maxHttpHeaderSize="8192"
+                maxThreads="150"
+                minSpareThreads="25"
+                protocol="HTTP/1.1"
+                redirectPort="8443"
+                useBodyEncodingForURI="true"/>
+
+            <Connector port="8443"
+                protocol="org.apache.coyote.http11.Http11NioProtocol"
+                maxHttpHeaderSize="8192"
+                SSLEnabled="true"
+                maxThreads="150"
+                minSpareThreads="25"
+                enableLookups="false"
+                disableUploadTimeout="true"
+                acceptCount="100"
+                scheme="https"
+                proxyName="{{ customer_name }}-{{ app }}.{{ r53_zone }}"
+                proxyPort="443"
+                secure="true"
+                clientAuth="false"
+                sslProtocol="TLS"
+                sslEnabledProtocols="TLSv1.2" useCipherSuitesOrder="true" ciphers="TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+                keyAlias="{{ customer_name }}-{{ app }}"
+                keystoreFile="{{ confluence_home }}/{{ appkey }}.jks"
+                keystorePass="changeit"
+                keystoreType="JKS"
+                useBodyEncodingForURI="true"/>
+
+        <Engine name="Standalone" defaultHost="localhost" debug="0">
+
+            <Host name="localhost" debug="0" appBase="webapps" unpackWARs="true" autoDeploy="false" startStopThreads="4">
+                <Context path="/conf" docBase="../confluence" debug="0" reloadable="false" useHttpOnly="true">
+                    <!-- Logger is deprecated in Tomcat 5.5. Logging configuration for Confluence is specified in confluence/WEB-INF/classes/log4j.properties -->
+                    <Manager pathname="" />
+                    <Valve className="org.apache.catalina.valves.StuckThreadDetectionValve" threshold="60" />
+                </Context>
+
+                <Context path="${confluence.context.path}/synchrony-proxy" docBase="../synchrony-proxy" debug="0" reloadable="false" useHttpOnly="true">
+                    <Valve className="org.apache.catalina.valves.StuckThreadDetectionValve" threshold="60" />
+                </Context>
+            </Host>
+
+        </Engine>
+    </Service>
+</Server>

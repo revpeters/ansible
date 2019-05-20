@@ -11,12 +11,18 @@
     ec2:
       region: "{{ region }}"
       key_name: "{{ ec2_key }}"
-      image: "{{ db_ami_image }}"
-      instance_type: "{{ db_instance_type }}"
+      image: "{{ db_image }}"
+      instance_type: "{{ instance_type }}"
       group_id: "{{ database_sg_id }}"
       vpc_subnet_id: "{{ db_subnet_1_id }}"
       assign_public_ip: no
       private_ip: 10.0.2.13
+      volumes:
+        - device_name: /dev/sda1
+          name: pgpool.{{ customer_name }}.{{ tld }}
+          volume_size: "{{ postgres_ec2_size }}"
+          volume_type: gp2
+          encrypted: True
       wait: yes
       instance_tags:
         Name: pgpool.{{ customer_name }}.{{ tld }}
@@ -26,12 +32,18 @@
     ec2:
       region: "{{ region }}"
       key_name: "{{ ec2_key }}"
-      image: "{{ db_ami_image }}"
-      instance_type: "{{ db_instance_type }}"
+      image: "{{ db_image }}"
+      instance_type: "{{ instance_type }}"
       group_id: "{{ database_sg_id }}"
       vpc_subnet_id: "{{ db_subnet_1_id }}"
       assign_public_ip: no
       private_ip: 10.0.2.11
+      volumes:
+        - device_name: /dev/sda1
+          name: pgres1.{{ customer_name }}.{{ tld }}
+          volume_size: "{{ postgres_ec2_size }}"
+          volume_type: gp2
+          encrypted: True
       wait: yes
       instance_tags:
         Name: pgres1.{{ customer_name }}.{{ tld }}
@@ -41,12 +53,18 @@
     ec2:
       region: "{{ region }}"
       key_name: "{{ ec2_key }}"
-      image: "{{ db_ami_image }}"
-      instance_type: "{{ db_instance_type }}"
+      image: "{{ db_image }}"
+      instance_type: "{{ instance_type }}"
       group_id: "{{ database_sg_id }}"
       vpc_subnet_id: "{{ db_subnet_1_id }}"
       assign_public_ip: no
       private_ip: 10.0.2.12
+      volumes:
+        - device_name: /dev/sda1
+          name: pgres2.{{ customer_name }}.{{ tld }}
+          volume_size: "{{ postgres_ec2_size }}"
+          volume_type: gp2
+          encrypted: True
       instance_tags:
         Name: pgres2.{{ customer_name }}.{{ tld }}
       wait: yes

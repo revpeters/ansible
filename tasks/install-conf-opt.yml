@@ -6,6 +6,7 @@
   gather_facts: yes
   vars:
     app: conf
+    appkey: confluence
   vars_files:
     - ../vars/control.yml
   tasks:
@@ -57,11 +58,24 @@
         - { src: "{{ confluence_install_dir }}/{{ confluence_version }}", dest: "{{ confluence_install_dir }}/current" }
         - { src: "{{ java_install_dir }}/{{ java_version }}", dest: "{{ java_install_dir }}/current" }
 
+    - name: Remove ssl.conf
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - "/etc/httpd/conf.d/ssl.conf"
+
     - name: Update JAVA_HOME
       lineinfile:
         path: "/home/{{ atlassian_user }}/.bash_profile"
         insertbefore: 'export PATH'
         line: 'export JAVA_HOME={{ java_home }}'
+
+    - name: Update PATH
+      lineinfile:
+        path: "/home/{{ atlassian_user }}/.bash_profile"
+        regex: '^export PATH'
+        line: 'export PATH=$PATH:$JAVA_HOME/jre/bin'
 
     - name: Update init.properties with confluence-home
       lineinfile:
@@ -85,15 +99,52 @@
         owner: "{{ atlassian_user }}"
         group: "{{ atlassian_group }}"
       with_items:
-        - { src: "/etc/ansible/playbooks/templates/server.xml.j2", dest: "{{ confluence_install_dir }}/current/conf/server.xml" }
-        - { src: "/etc/ansible/playbooks/templates/httpd.conf.j2", dest: "/etc/httpd/conf/httpd.conf" }
+        - { src: "/etc/ansible/playbooks/templates/confluence/server.xml.j2", dest: "{{ confluence_install_dir }}/current/conf/server.xml" }
+        - { src: "/etc/ansible/playbooks/templates/confluence/httpd.conf.vhost80.j2", dest: "/etc/httpd/conf/httpd.conf" }
+        - { src: "/etc/ansible/playbooks/templates/confluence/renewcerts.sh.j2", dest: "{{ confluence_home }}/renewcerts.sh"}
       become: true
+
+    - name: Make renewcerts executable for atlasian
+      file:
+        path: /data/atlassian/confluence-home/renewcerts.sh
+        mode: 0755
 
     - name: Start HTTPD
       service:
         name: httpd
         state: started
 
-    - name: Start Confluence
-      command: su - atlasian -c "{{ confluence_install_dir }}/current/bin/start-confluence.sh"
+    - name: Generate ssl certs
+      shell: "certbot --apache certonly -n -d {{ customer_name }}-{{ app }}.{{ r53_zone }} --agree-tos --email jacopete@cisco.com"
 
+    - name: Make atlasian owner of /etc/letsencrypt
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ atlassian_user }}"
+        group: "{{ atlassian_group }}"
+        recurse: yes
+      with_items:
+        - "/etc/letsencrypt"
+
+    - name: Import certs and build jks
+      shell: su - atlasian -c "/data/atlassian/confluence-home/renewcerts.sh"
+
+    - name: Update httpd.conf and server.xml with domain names
+      template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: "{{ atlassian_user }}"
+        group: "{{ atlassian_group }}"
+      with_items:
+        - { src: "/etc/ansible/playbooks/templates/confluence/httpd.conf.j2", dest: "/etc/httpd/conf/httpd.conf" }
+
+    - name: Start HTTPD
+      service:
+        name: httpd
+        state: restarted
+
+#    - name: Restart Confluence
+#      command: "{{ item }}"
+#      with_items:
+#        - su - atlasian -c "{{ confluence_install_dir }}/current/bin/start-confluence.sh"
