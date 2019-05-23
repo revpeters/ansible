@@ -22,7 +22,7 @@
       state: present
       overwrite: yes
       zone: "{{ r53_zone }}"
-      record: "{{ customer_name }}-conf.{{ r53_zone }}"
+      record: "{{ customer_name }}-confluence.{{ r53_zone }}"
       type: A
       value:
         - "{{ conf_ip }}"

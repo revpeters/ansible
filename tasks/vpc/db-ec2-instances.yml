@@ -26,6 +26,14 @@
       wait: yes
       instance_tags:
         Name: pgpool.{{ customer_name }}.{{ tld }}
+        Application Name: ALM - Atlassian
+        Cisco Mail Alias: atlassian-adm@cisco.com
+        Customer: "{{ customer_name }}"
+        Data Classification: Cisco Confidential
+        Enviroment: "{{ prod_status }}"
+        Resource Owner: atlassian-adm
+        Security Compliance: N/A
+        dbhost_type: dbproxy
     register: pgpool
 
   - name: Create Pgres1 EC2 instance
@@ -47,6 +55,14 @@
       wait: yes
       instance_tags:
         Name: pgres1.{{ customer_name }}.{{ tld }}
+        Application Name: ALM - Atlassian
+        Cisco Mail Alias: atlassian-adm@cisco.com
+        Customer: "{{ customer_name }}"
+        Data Classification: Cisco Confidential
+        Enviroment: "{{ prod_status }}"
+        Resource Owner: atlassian-adm
+        Security Compliance: N/A
+        dbhost_type: dbprimary
     register: pgres1
 
   - name: Create Pgres2 EC2 instance
@@ -67,6 +83,14 @@
           encrypted: True
       instance_tags:
         Name: pgres2.{{ customer_name }}.{{ tld }}
+        Application Name: ALM - Atlassian
+        Cisco Mail Alias: atlassian-adm@cisco.com
+        Customer: "{{ customer_name }}"
+        Data Classification: Cisco Confidential
+        Enviroment: "{{ prod_status }}"
+        Resource Owner: atlassian-adm
+        Security Compliance: N/A
+        dbhost_type: dbstandby
       wait: yes
     register: pgres2
 

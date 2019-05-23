@@ -26,6 +26,13 @@
       wait: yes
       instance_tags:
         Name: jira.{{ customer_name }}.{{ tld }}
+        Application Name: ALM - Atlassian
+        Cisco Mail Alias: atlassian-adm@cisco.com
+        Customer: "{{ customer_name }}"
+        Data Classification: Cisco Confidential
+        Enviroment: "{{ prod_status }}"
+        Resource Owner: atlassian-adm
+        Security Compliance: N/A
     register: jira
 
   - name: Create CONFLUENCE EC2 instance
@@ -47,6 +54,13 @@
       wait: yes
       instance_tags:
         Name: conf.{{ customer_name }}.{{ tld }}
+        Application Name: ALM - Atlassian
+        Cisco Mail Alias: atlassian-adm@cisco.com
+        Customer: "{{ customer_name }}"
+        Data Classification: Cisco Confidential
+        Enviroment: "{{ prod_status }}"
+        Resource Owner: atlassian-adm
+        Security Compliance: N/A
     register: conf
 
   - name: Create Bastion EC2 instance
@@ -67,6 +81,13 @@
           encrypted: True
       instance_tags:
         Name: jump.{{ customer_name }}.{{ tld }}
+        Application Name: ALM - Atlassian
+        Cisco Mail Alias: atlassian-adm@cisco.com
+        Customer: "{{ customer_name }}"
+        Data Classification: Cisco Confidential
+        Enviroment: "{{ prod_status }}"
+        Resource Owner: atlassian-adm
+        Security Compliance: N/A
       wait: yes
     register: bastion
 
