@@ -7,8 +7,17 @@
   vars_files:
     - ../../vars/control.yml
   tasks:
-  - name: Create  Route Table
+  - name: Get Default Route Table
+    register: rt_id
+    ec2_vpc_route_table_facts:
+      region: "{{ region }}"
+      filters:
+        'vpc-id': "{{ vpc_id }}"
+
+  - name: Update Route Table
     ec2_vpc_route_table:
+      route_table_id: "{{ rt_id.route_tables[0].id }}"
+      lookup: id
       tags:
         Name: alm-{{ customer_name }}-RT
       state: present
@@ -17,8 +26,20 @@
       subnets:
         - "{{ public_subnet_id }}"
         - "{{ private_subnet_id }}"
-        - "{{ db_subnet_1_id }}"
         - "{{ db_subnet_2_id }}"
       routes:
         - dest: "0.0.0.0/0"
           gateway_id: "{{ igw_id }}"
+
+  - name: Create NAT Route Table
+    ec2_vpc_route_table:
+      tags:
+        Name: alm-{{ customer_name }}-RT-NAT
+      state: present
+      vpc_id: "{{ vpc_id }}"
+      region: "{{ region }}"
+      subnets:
+      - "{{ db_subnet_1_id }}"
+      routes:
+      - dest: "0.0.0.0/0"
+        gateway_id: "{{ nat_gw_id }}"

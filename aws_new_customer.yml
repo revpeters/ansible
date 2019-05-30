@@ -27,4 +27,3 @@
 - import_playbook: tasks/configure-atlassian-instance.yml
 - import_playbook: tasks/install-jira-opt.yml
 - import_playbook: tasks/install-conf-opt.yml
-#- import_playbook: tasks/create-postgres-user.yml

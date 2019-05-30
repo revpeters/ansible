@@ -8,12 +8,13 @@
 #app:
 #  jira: jira
 #  conf: conf
+prod_status: NonProd
 
 r53_zone: engit-alm.com
 
 app_image: ami-0a865eb1e9423a1c4
 jump_image: ami-0a865eb1e9423a1c4
-db_image: ami-0246bb659d1d9b49a
+db_image: ami-0333aa317497164ea
 
 instance_type: m4.xlarge
 
@@ -51,6 +52,7 @@ confluence_ec2_size: 200
 postgres_ec2_size: 110
 
 postgres_driver: postgresql-42.1.1.jar
+
 rds_engine: postgres
 rds_version: 9.6.11
 rds_endpoint:

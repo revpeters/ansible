@@ -19,7 +19,6 @@
       private_ip: 10.0.2.13
       volumes:
         - device_name: /dev/sda1
-          name: pgpool.{{ customer_name }}.{{ tld }}
           volume_size: "{{ postgres_ec2_size }}"
           volume_type: gp2
           encrypted: True
@@ -36,6 +35,20 @@
         dbhost_type: dbproxy
     register: pgpool
 
+  - name: Get pgpool volume id
+    ec2_vol:
+      instance: "{{ pgpool.instance_ids[0] }}"
+      region: "{{ region }}"
+      state: list
+    register: pgpool_vol
+
+  - name: Tag pgpool EBS Volume
+    ec2_tag:
+      region: "{{ region }}"
+      resource: "{{ pgpool_vol.volumes[0].id }}"
+      tags:
+        Name: pgpool.{{ customer_name }}.{{ tld }}
+
   - name: Create Pgres1 EC2 instance
     ec2:
       region: "{{ region }}"
@@ -48,7 +61,6 @@
       private_ip: 10.0.2.11
       volumes:
         - device_name: /dev/sda1
-          name: pgres1.{{ customer_name }}.{{ tld }}
           volume_size: "{{ postgres_ec2_size }}"
           volume_type: gp2
           encrypted: True
@@ -65,6 +77,20 @@
         dbhost_type: dbprimary
     register: pgres1
 
+  - name: Get pgres1 volume id
+    ec2_vol:
+      instance: "{{ pgres1.instance_ids[0] }}"
+      region: "{{ region }}"
+      state: list
+    register: pgres1_vol
+
+  - name: Tag pgres1 EBS Volume
+    ec2_tag:
+      region: "{{ region }}"
+      resource: "{{ pgres1_vol.volumes[0].id }}"
+      tags:
+        Name: pgres1.{{ customer_name }}.{{ tld }}
+
   - name: Create Pgres2 EC2 instance
     ec2:
       region: "{{ region }}"
@@ -77,7 +103,6 @@
       private_ip: 10.0.2.12
       volumes:
         - device_name: /dev/sda1
-          name: pgres2.{{ customer_name }}.{{ tld }}
           volume_size: "{{ postgres_ec2_size }}"
           volume_type: gp2
           encrypted: True
@@ -93,6 +118,20 @@
         dbhost_type: dbstandby
       wait: yes
     register: pgres2
+
+  - name: Get pgres2 volume id
+    ec2_vol:
+      instance: "{{ pgres2.instance_ids[0] }}"
+      region: "{{ region }}"
+      state: list
+    register: pgres2_vol
+
+  - name: Tag pgres2 EBS Volume
+    ec2_tag:
+      region: "{{ region }}"
+      resource: "{{ pgres2_vol.volumes[0].id }}"
+      tags:
+        Name: pgres2.{{ customer_name }}.{{ tld }}
 
   - name: Store pgpool IP in pgpool_ip
     set_fact:

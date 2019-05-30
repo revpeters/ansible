@@ -115,7 +115,7 @@
         state: started
 
     - name: Generate ssl certs
-      shell: "certbot --apache certonly -n -d {{ customer_name }}-{{ app }}.{{ r53_zone }} --agree-tos --email jacopete@cisco.com"
+      shell: "certbot --apache certonly -n -d {{ customer_name }}-{{ appkey }}.{{ r53_zone }} --agree-tos --email jacopete@cisco.com"
 
     - name: Make atlasian owner of /etc/letsencrypt
       file:

@@ -9,6 +9,8 @@
   tasks:
   - name: Create Jumphost Security Group
     ec2_group:
+      tags:
+        name: alm-{{ customer_name }}-jump
       name: alm-{{ customer_name }}-jump
       description: alm-{{ customer_name }}-jump
       vpc_id: "{{ vpc_id }}"
@@ -57,6 +59,8 @@
 
   - name: Create WebApps Security Group
     ec2_group:
+      tags:
+        Name: alm-{{ customer_name }}-webapps
       name: alm-{{ customer_name }}-webapps
       description: alm-{{ customer_name }}-webapps
       vpc_id: "{{ vpc_id }}"
@@ -67,8 +71,6 @@
             - 8443
             - 80
             - 443
-            - 8080
-            - 8090
           cidr_ip: 0.0.0.0/0
         - proto: "tcp"
           ports: 22
@@ -81,6 +83,8 @@
 
   - name: Create Database Security Group
     ec2_group:
+      tags:
+        name: alm-{{ customer_name }}-db
       name: alm-{{ customer_name }}-db
       description: alm-{{ customer_name }}-db
       vpc_id: "{{ vpc_id }}"
@@ -105,6 +109,8 @@
 
   - name: Create Kali Security Group
     ec2_group:
+      tags:
+        name: alm-{{ customer_name }}-kali
       name: alm-{{ customer_name }}-kali
       description: alm-{{ customer_name }}-kali
       vpc_id: "{{ vpc_id }}"
@@ -123,6 +129,8 @@
 
   - name: Create Monitor Security Group
     ec2_group:
+      tags:
+        name: alm-{{ customer_name }}-monitor
       name: alm-{{ customer_name }}-monitor
       description: alm-{{ customer_name }}-monitor
       vpc_id: "{{ vpc_id }}"

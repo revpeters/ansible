@@ -7,8 +7,16 @@
   vars_files:
     - ../../vars/control.yml
   tasks:
-  - name: Create NACL
+  - name: Get Default NACL ID
+    register: nacl_id
+    ec2_vpc_nacl_facts:
+      region: us-east-1
+      filters:
+        'vpc-id': "{{ vpc_id }}"
+
+  - name: Update NACL
     ec2_vpc_nacl:
+      nacl_id: "{{ nacl_id.nacls[0].nacl_id }}"
       name: alm-{{ customer_name }}-nacl
       state: present
       vpc_id: "{{ vpc_id }}"

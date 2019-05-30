@@ -1,0 +1,27 @@
+--- # AWS ALM VPC Creation
+- hosts: localhost
+  connection: local
+  remote_user: jacopete
+  become: no
+  gather_facts: no
+  vars_files:
+    - ../../vars/control.yml
+  tasks:
+  - name: Create NAT Gateway
+    ec2_vpc_nat_gateway:
+      if_exist_do_not_create: yes
+      state: present
+      region: "{{ region }}"
+      subnet_id: "{{ private_subnet_id }}"
+    register: nat_gw
+
+  - name: Set NAT Gateway ID in var
+    set_fact:
+      nat_gw_id: "{{ nat_gw.nat_gateway_id }}"
+
+  - name: Tag name on gateway
+    ec2_tag:
+      region: "{{ region }}"
+      resource: "{{ nat_gw.nat_gateway_id }}"
+      tags:
+        Name: nat-gw.{{ customer_name }}.{{ tld }}

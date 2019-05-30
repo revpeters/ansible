@@ -1,6 +1,7 @@
 --- # AWS playbook to create a Virtual Private Network and Elastic Compute Cloud instances
 - import_playbook: vpc/vpc-igw.yml
 - import_playbook: vpc/subnets.yml
+- import_playbook: vpc/nat-gw.yml
 #- import_playbook: vpc/rds-subnet-groups.yml
 - import_playbook: vpc/route-tables.yml
 - import_playbook: vpc/nacl.yml
