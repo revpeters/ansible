@@ -73,7 +73,7 @@
         dest: "{{ jira_install_dir }}/current/lib/"
         owner: "{{ atlassian_user }}"
         group: "{{ atlassian_group }}"
-        mode: 0544
+        mode: 0644
 
     - name: Update JAVA_HOME
       lineinfile:

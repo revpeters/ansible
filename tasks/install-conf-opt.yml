@@ -81,7 +81,7 @@
       lineinfile:
         path: /data/atlassian/confluence/current/confluence/WEB-INF/classes/confluence-init.properties
         regexp: '^# confluence.home='
-        line: 'confluence.home="/data/atlassian/confluence-home"'
+        line: 'confluence.home=/data/atlassian/confluence-home'
 
     - name: Update setenv.sh
       copy:
