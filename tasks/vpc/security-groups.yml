@@ -84,7 +84,7 @@
   - name: Create Database Security Group
     ec2_group:
       tags:
-        name: alm-{{ customer_name }}-db
+        Name: alm-{{ customer_name }}-db
       name: alm-{{ customer_name }}-db
       description: alm-{{ customer_name }}-db
       vpc_id: "{{ vpc_id }}"
@@ -99,6 +99,11 @@
             - 6739
           group_id: "{{ jump_sg_id }}"
         - proto: "tcp"
+          ports:
+          - 22
+          - 6739
+          group_id: "{{ jump_sg_id }}"
+        - proto: "tcp"
           ports: 5493
           cidr_ip: 0.0.0.0/0
     register: database_sg
@@ -106,6 +111,26 @@
   - name: Set Database Security Group ID in var
     set_fact:
       database_sg_id: "{{ database_sg.group_id }}"
+
+  - name: Open inbound rules for cluster in Database Security Group
+    ec2_group:
+      purge_rules: no
+      purge_rules_egress: no
+      tags:
+        Name: alm-{{ customer_name }}-db
+      name: alm-{{ customer_name }}-db
+      description: alm-{{ customer_name }}-db
+      vpc_id: "{{ vpc_id }}"
+      region: "{{ region }}"
+      rules:
+      - proto: "tcp"
+        ports:
+        - 22
+        - 9000
+        - 9898
+        - 5493
+        - 9694
+        group_id: "{{ database_sg_id }}"
 
   - name: Create Kali Security Group
     ec2_group:

@@ -6,6 +6,10 @@
   vars_files:
     - ../vars/control.yml
   tasks:
+    - name: Set vars from localhost
+      set_fact:
+        customer_name: "{{hostvars['localhost']['customer_name']}}"
+
     - name: Create Atlasian group
       group:
         name: "{{ atlassian_group }}"
@@ -58,3 +62,15 @@
       service:
         name: httpd
         enabled: yes
+
+    - name: Create cron to renew ssl certs
+      cron:
+        name: "Check to see if the cert needs to be renewed at 3:00 am"
+        minute: "0"
+        hour: "3"
+        job: "certbot renew --renew-hook /data/atlassian/jira-home/scripts/renewcerts.sh"
+
+    - name: Add customer name to cli prompt
+      lineinfile:
+        path: /etc/profile
+        line: 'PS1="[{{ customer_name }}:\u@\h \W]$ "'

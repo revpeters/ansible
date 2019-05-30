@@ -3,6 +3,9 @@
 
 echo "If you encounter issues starting up Confluence, please see the Installation guide at http://confluence.atlassian.com/display/DOC/Confluence+Installation+Guide"
 
+CONFLUENCE_HOME="/data/atlassian/confluence-home"
+CONFLUENCE_HOME_MINUSD="-Dconfluence.home=$CONFLUENCE_HOME"
+
 # set the location of the pid file
 if [ -z "$CATALINA_PID" ] ; then
     if [ -n "$CATALINA_BASE" ] ; then

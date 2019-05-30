@@ -19,6 +19,11 @@
       private_ip: 10.0.2.13
       volumes:
         - device_name: /dev/sda1
+          volume_size: 10
+          volume_type: gp2
+          encrypted: True
+
+        - device_name: /dev/sdb
           volume_size: "{{ postgres_ec2_size }}"
           volume_type: gp2
           encrypted: True
@@ -49,6 +54,13 @@
       tags:
         Name: pgpool.{{ customer_name }}.{{ tld }}
 
+  - name: Tag pgpool EBS Volume
+    ec2_tag:
+      region: "{{ region }}"
+      resource: "{{ pgpool_vol.volumes[1].id }}"
+      tags:
+        Name: pgpool.{{ customer_name }}.{{ tld }}
+
   - name: Create Pgres1 EC2 instance
     ec2:
       region: "{{ region }}"
@@ -61,6 +73,11 @@
       private_ip: 10.0.2.11
       volumes:
         - device_name: /dev/sda1
+          volume_size: 10
+          volume_type: gp2
+          encrypted: True
+
+        - device_name: /dev/sdb
           volume_size: "{{ postgres_ec2_size }}"
           volume_type: gp2
           encrypted: True
@@ -91,6 +108,13 @@
       tags:
         Name: pgres1.{{ customer_name }}.{{ tld }}
 
+  - name: Tag pgres1 EBS Volume
+    ec2_tag:
+      region: "{{ region }}"
+      resource: "{{ pgres1_vol.volumes[1].id }}"
+      tags:
+        Name: pgres1.{{ customer_name }}.{{ tld }}
+
   - name: Create Pgres2 EC2 instance
     ec2:
       region: "{{ region }}"
@@ -103,6 +127,11 @@
       private_ip: 10.0.2.12
       volumes:
         - device_name: /dev/sda1
+          volume_size: 10
+          volume_type: gp2
+          encrypted: True
+
+        - device_name: /dev/sdb
           volume_size: "{{ postgres_ec2_size }}"
           volume_type: gp2
           encrypted: True
@@ -130,6 +159,13 @@
     ec2_tag:
       region: "{{ region }}"
       resource: "{{ pgres2_vol.volumes[0].id }}"
+      tags:
+        Name: pgres2.{{ customer_name }}.{{ tld }}
+
+  - name: Tag pgres2 EBS Volume
+    ec2_tag:
+      region: "{{ region }}"
+      resource: "{{ pgres2_vol.volumes[1].id }}"
       tags:
         Name: pgres2.{{ customer_name }}.{{ tld }}
 

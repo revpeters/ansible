@@ -1,6 +1,10 @@
 ---
 - hosts: localhost
   connection: local
+  vars:
+    tld_map:
+      us-east-1: nva
+      us-west-2: ore
   vars_prompt:
     - name: "customer_name"
       prompt: "What ID are we using for the customer?"
@@ -10,17 +14,13 @@
       prompt: "What region are we deploying them in?"
       default: "us-east-1"
       private: no
-    - name: "tld"
-      prompt: "What top level domain are you using?"
-      default: "nva"
-      private: no
   tasks:
   - set_fact:
       customer_name: "{{ customer_name  }}"
   - set_fact:
       region: "{{ region }}"
   - set_fact:
-      tld: "{{ tld }}"
+      tld: "{{ tld_map[region] }}"
 
 - import_playbook: tasks/create-vpc.yml
 - import_playbook: tasks/bastion-config.yml
