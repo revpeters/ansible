@@ -33,8 +33,8 @@ Listen 443
          Require all granted
     </Proxy>
 
-    ProxyPass /jira https://{{ customer_name }}-{{ app }}.{{ r53_zone }}:8443/jira
-    ProxyPassReverse /jira https://{{ customer_name }}-{{ app }}.{{ r53_zone }}:8443/jira
+    ProxyPass /jira https://{{ customer_name }}-{{ app }}.{{ r53_zone }}:8443/jira timeout=300
+    ProxyPassReverse /jira https://{{ customer_name }}-{{ app }}.{{ r53_zone }}:8443/jira timeout=300
 
     <Location /jira>
          Require all granted
