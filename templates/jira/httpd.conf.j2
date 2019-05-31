@@ -22,7 +22,7 @@ Listen 443
     SSLProxyCheckPeerName       Off
     SSLProxyVerify              None
     SSLProxyCheckPeerExpire     Off
-    SSLCertificateFile          /etc/letsencrypt/live/{{ customer_name }}-{{ app }}.{{ r53_zone }}/fullchain.pem
+    SSLCertificateFile          /etc/letsencrypt/live/{{ customer_name }}-{{ app }}.{{ r53_zone }}/cert.pem
     SSLCertificateKeyFile       /etc/letsencrypt/live/{{ customer_name }}-{{ app }}.{{ r53_zone }}/privkey.pem
     SSLCertificateChainFile     /etc/letsencrypt/live/{{ customer_name }}-{{ app }}.{{ r53_zone }}/chain.pem
     ErrorLog                    logs/ssl_error_log
