@@ -5,6 +5,9 @@
     tld_map:
       us-east-1: nva
       us-west-2: ore
+    a_zone_map:
+      us-east-1: ['us-east-1a', 'us-east-1e', 'us-east-1f']
+      us-west-2: ['us-west-2a', 'us-west-2c', 'us-west-2d']
   vars_prompt:
     - name: "customer_name"
       prompt: "What ID are we using for the customer?"
@@ -21,6 +24,8 @@
       region: "{{ region }}"
   - set_fact:
       tld: "{{ tld_map[region] }}"
+  - set_fact:
+      a_zone: "{{ a_zone_map[region] }}"
 
 - import_playbook: tasks/create-vpc.yml
 - import_playbook: tasks/bastion-config.yml

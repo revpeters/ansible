@@ -15,7 +15,7 @@
       vpc_id: "{{ vpc_id }}"
       region: "{{ region }}"
       cidr: 10.0.0.0/24
-      az: us-east-1a
+      az: "{{ a_zone[0] }}"
     register: public_subnet
 
   - name: Create Private Subnet
@@ -26,7 +26,7 @@
       vpc_id: "{{ vpc_id }}"
       region: "{{ region }}"
       cidr: 10.0.1.0/24
-      az: us-east-1a
+      az: "{{ a_zone[0] }}"
     register: private_subnet
 
   - name: Create DB Subnet
@@ -37,7 +37,7 @@
       vpc_id: "{{ vpc_id }}"
       region: "{{ region }}"
       cidr: 10.0.2.0/24
-      az: us-east-1e
+      az: "{{ a_zone[1] }}"
     register: db_subnet_1
 
   - name: Create DB Subnet
@@ -48,7 +48,7 @@
       vpc_id: "{{ vpc_id }}"
       region: "{{ region }}"
       cidr: 10.0.3.0/24
-      az: us-east-1f
+      az: "{{ a_zone[2] }}"
     register: db_subnet_2
 
   - name: Set Public Subnet ID in var
